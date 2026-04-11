@@ -15,7 +15,12 @@ export type Database = {
         Row: Profile
         Insert: Omit<Profile, 'is_platform_admin' | 'is_banned' | 'created_at'>
         Update: Partial<Pick<Profile, 'username' | 'avatar_url' | 'bio'>>
+        Relationships: []
       }
     }
+    Views: Record<string, never>
+    Functions: Record<string, never>
+    Enums: Record<string, never>
+    CompositeTypes: Record<string, never>
   }
 }
