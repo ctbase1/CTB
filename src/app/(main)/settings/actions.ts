@@ -13,6 +13,11 @@ export async function updateProfile(formData: FormData) {
   const bio        = (formData.get('bio') as string).trim()
   const avatar_url = formData.get('avatar_url') as string | null
 
+  // Validate avatar_url is a Cloudinary URL (prevents storing arbitrary URLs)
+  if (avatar_url && !avatar_url.startsWith('https://res.cloudinary.com/')) {
+    redirect('/settings?error=' + encodeURIComponent('Invalid avatar URL'))
+  }
+
   if (!/^[a-z0-9_]{3,20}$/.test(username)) {
     redirect('/settings?error=' + encodeURIComponent('Username must be 3-20 chars: letters, numbers, underscores only'))
   }

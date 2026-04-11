@@ -14,17 +14,6 @@ export async function signUp(formData: FormData) {
 
   const supabase = createClient()
 
-  // Check username availability before signup
-  const { data: existing } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('username', username)
-    .single()
-
-  if (existing) {
-    redirect('/register?error=' + encodeURIComponent('Username already taken'))
-  }
-
   const { error } = await supabase.auth.signUp({
     email,
     password,
