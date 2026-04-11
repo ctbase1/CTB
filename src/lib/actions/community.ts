@@ -11,8 +11,8 @@ export async function createCommunity(formData: FormData) {
   if (!user) redirect('/login')
 
   const name        = (formData.get('name') as string).trim()
-  const description = (formData.get('description') as string).trim()
-  const banner_url  = formData.get('banner_url') as string | null
+  const description = ((formData.get('description') as string) ?? '').trim()
+  const banner_url  = (formData.get('banner_url') as string) || null
 
   if (name.length < 3) {
     redirect('/c/new?error=' + encodeURIComponent('Community name must be at least 3 characters'))
@@ -37,7 +37,15 @@ export async function createCommunity(formData: FormData) {
     .single()
 
   if (existing) {
-    slug = `${slug}-${Math.random().toString(36).slice(2, 6)}`
+    const candidate = `${slug}-${Math.random().toString(36).slice(2, 6)}`
+    const { data: stillExists } = await supabase
+      .from('communities')
+      .select('id')
+      .eq('slug', candidate)
+      .single()
+    slug = stillExists
+      ? `${slug}-${Math.random().toString(36).slice(2, 6)}`
+      : candidate
   }
 
   const { data: community, error } = await supabase

@@ -22,7 +22,7 @@ export default function NewCommunityPage() {
 
       {error && (
         <p className="mb-4 rounded-md bg-red-900/30 px-4 py-2 text-sm text-red-400">
-          {decodeURIComponent(error)}
+          {error}
         </p>
       )}
 
@@ -43,11 +43,9 @@ export default function NewCommunityPage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-          {name && (
-            <p className="text-xs text-zinc-500">
-              URL: <span className="text-zinc-300">c/{slugPreview || '…'}</span>
-            </p>
-          )}
+          <p className="text-xs text-zinc-500">
+            URL: <span className="text-zinc-300">c/{slugPreview || '…'}</span>
+          </p>
         </div>
 
         <textarea
