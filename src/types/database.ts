@@ -39,6 +39,83 @@ export type Database = {
   }
   public: {
     Tables: {
+      communities: {
+        Row: {
+          banner_url: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          is_removed: boolean
+          name: string
+          slug: string
+        }
+        Insert: {
+          banner_url?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          is_removed?: boolean
+          name: string
+          slug: string
+        }
+        Update: {
+          banner_url?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          is_removed?: boolean
+          name?: string
+          slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "communities_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memberships: {
+        Row: {
+          community_id: string
+          joined_at: string
+          role: Database["public"]["Enums"]["membership_role"]
+          user_id: string
+        }
+        Insert: {
+          community_id: string
+          joined_at?: string
+          role?: Database["public"]["Enums"]["membership_role"]
+          user_id: string
+        }
+        Update: {
+          community_id?: string
+          joined_at?: string
+          role?: Database["public"]["Enums"]["membership_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memberships_community_id_fkey"
+            columns: ["community_id"]
+            isOneToOne: false
+            referencedRelation: "communities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "memberships_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -77,7 +154,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      membership_role: "admin" | "moderator" | "member"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -207,9 +284,14 @@ export const Constants = {
     Enums: {},
   },
   public: {
-    Enums: {},
+    Enums: {
+      membership_role: ["admin", "moderator", "member"],
+    },
   },
 } as const
 
-// Convenience type used throughout the app
+// Convenience types used throughout the app
 export type Profile = Database['public']['Tables']['profiles']['Row']
+export type Community = Database['public']['Tables']['communities']['Row']
+export type Membership = Database['public']['Tables']['memberships']['Row']
+export type MembershipRole = Database['public']['Enums']['membership_role']
