@@ -10,7 +10,7 @@ export async function createCommunity(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const name        = (formData.get('name') as string).trim()
+  const name        = ((formData.get('name') as string) ?? '').trim()
   const description = ((formData.get('description') as string) ?? '').trim()
   const banner_url  = (formData.get('banner_url') as string) || null
 
@@ -61,7 +61,10 @@ export async function createCommunity(formData: FormData) {
     .single()
 
   if (error || !community) {
-    redirect('/c/new?error=' + encodeURIComponent(error?.message ?? 'Failed to create community'))
+    const msg = error?.code === '23505'
+      ? 'That community name is already taken'
+      : (error?.message ?? 'Failed to create community')
+    redirect('/c/new?error=' + encodeURIComponent(msg))
   }
 
   revalidatePath('/')
