@@ -18,7 +18,6 @@ export const metadata: Metadata = {
   title: "CTB Community",
   description: "A crypto-focused community platform",
   icons: {
-    icon: "/favicon.png",
     apple: "/favicon.png",
   },
 };
