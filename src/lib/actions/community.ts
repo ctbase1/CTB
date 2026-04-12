@@ -37,15 +37,20 @@ export async function createCommunity(formData: FormData) {
     .single()
 
   if (existing) {
-    const candidate = `${slug}-${Math.random().toString(36).slice(2, 6)}`
-    const { data: stillExists } = await supabase
-      .from('communities')
-      .select('id')
-      .eq('slug', candidate)
-      .single()
-    slug = stillExists
-      ? `${slug}-${Math.random().toString(36).slice(2, 6)}`
-      : candidate
+    // Try up to 3 suffixed candidates; DB unique constraint is the final safety net
+    let resolved = false
+    for (let i = 0; i < 3 && !resolved; i++) {
+      const candidate = `${slug}-${Math.random().toString(36).slice(2, 6)}`
+      const { data: taken } = await supabase
+        .from('communities')
+        .select('id')
+        .eq('slug', candidate)
+        .single()
+      if (!taken) {
+        slug = candidate
+        resolved = true
+      }
+    }
   }
 
   const { data: community, error } = await supabase
