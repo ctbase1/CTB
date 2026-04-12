@@ -6,6 +6,7 @@ import { CommentForm } from './comment-form'
 import { ReportButton } from './report-button'
 import { BanFromCommunityButton } from './ban-from-community-button'
 import { deleteComment } from '@/lib/actions/comment'
+import { MessageSquare, Trash2 } from 'lucide-react'
 
 export interface CommentData {
   id: string
@@ -38,24 +39,24 @@ export function CommentItem({
   canMod,
 }: Props) {
   const [showReplyForm, setShowReplyForm] = useState(false)
-  const isTopLevel  = !comment.parent_id
+  const isTopLevel   = !comment.parent_id
   const isOwnComment = !!userId && userId === comment.author_id
-  const canDelete   = isOwnComment || canMod
-  const canBan      = canMod && !isOwnComment
+  const canDelete    = isOwnComment || canMod
+  const canBan       = canMod && !isOwnComment
 
   return (
-    <div>
-      <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-3">
-        <div className="mb-1 flex items-center justify-between gap-2">
+    <div className={`${isTopLevel ? 'border-l-2 border-slate-700' : 'border-l-2 border-violet-900/50'} pl-4`}>
+      <div className="group rounded-xl bg-slate-900/60 p-3">
+        <div className="mb-1.5 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-white">
               {comment.author?.username ?? 'unknown'}
             </span>
-            <span className="text-xs text-zinc-500">
+            <span className="text-xs text-slate-500">
               {new Date(comment.created_at).toLocaleDateString()}
             </span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
             {userId && !isOwnComment && (
               <ReportButton targetId={comment.id} targetType="comment" />
             )}
@@ -77,8 +78,9 @@ export function CommentItem({
                   onClick={(e) => {
                     if (!confirm('Delete this comment?')) e.preventDefault()
                   }}
-                  className="text-xs text-zinc-600 hover:text-red-400"
+                  className="flex items-center gap-1 text-xs text-slate-600 hover:text-red-400 transition-colors"
                 >
+                  <Trash2 className="h-3 w-3" />
                   Delete
                 </button>
               </form>
@@ -86,9 +88,9 @@ export function CommentItem({
           </div>
         </div>
 
-        <p className="whitespace-pre-wrap text-sm text-zinc-300">{comment.body}</p>
+        <p className="whitespace-pre-wrap text-sm text-slate-300 leading-relaxed">{comment.body}</p>
 
-        <div className="mt-2 flex items-center gap-3">
+        <div className="mt-2.5 flex items-center gap-3">
           <LikeButton
             targetId={comment.id}
             targetType="comment"
@@ -99,8 +101,9 @@ export function CommentItem({
           {isTopLevel && userId && (
             <button
               onClick={() => setShowReplyForm(v => !v)}
-              className="text-xs text-zinc-500 hover:text-zinc-300"
+              className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-300 transition-colors"
             >
+              <MessageSquare className="h-3 w-3" />
               {showReplyForm ? 'Cancel' : 'Reply'}
             </button>
           )}
@@ -119,7 +122,7 @@ export function CommentItem({
       </div>
 
       {replies.length > 0 && (
-        <div className="ml-6 mt-2 space-y-2">
+        <div className="ml-4 mt-2 space-y-2">
           {replies.map(reply => (
             <CommentItem
               key={reply.id}

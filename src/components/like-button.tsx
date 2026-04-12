@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { toggleLike } from '@/lib/actions/like'
+import { Heart } from 'lucide-react'
 
 interface Props {
   targetId: string
@@ -44,13 +45,13 @@ export function LikeButton({
       <button
         onClick={handleClick}
         disabled={!userId || isPending}
-        className={`flex items-center gap-1.5 text-sm transition-colors disabled:opacity-50 ${
+        className={`flex items-center gap-1.5 text-sm transition-all disabled:opacity-50 ${
           liked
-            ? 'text-indigo-400'
-            : 'text-zinc-500 hover:text-zinc-300'
+            ? 'text-violet-400 scale-105'
+            : 'text-slate-500 hover:text-slate-300'
         }`}
       >
-        <span>{liked ? '♥' : '♡'}</span>
+        <Heart className={`h-3.5 w-3.5 transition-all ${liked ? 'fill-violet-400' : ''}`} />
         <span>{count}</span>
       </button>
       {error && <span className="text-xs text-red-400">{error}</span>}

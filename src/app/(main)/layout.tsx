@@ -21,7 +21,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
   if (!profile) redirect('/login')
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
+    <div className="min-h-screen bg-hero-glow text-white">
       <Navbar profile={profile} unreadCount={unreadCount ?? 0} />
       <main className="mx-auto max-w-4xl px-4 py-6">
         {children}

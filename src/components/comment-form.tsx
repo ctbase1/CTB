@@ -29,7 +29,7 @@ export function CommentForm({ postId, parentId, communitySlug, onSuccess }: Prop
   }
 
   return (
-    <form ref={formRef} action={handleSubmit} className="space-y-2">
+    <form ref={formRef} action={handleSubmit} className="space-y-2.5">
       <input type="hidden" name="post_id"        value={postId} />
       <input type="hidden" name="parent_id"      value={parentId ?? ''} />
       <input type="hidden" name="community_slug" value={communitySlug} />
@@ -38,13 +38,13 @@ export function CommentForm({ postId, parentId, communitySlug, onSuccess }: Prop
         required
         rows={3}
         placeholder={parentId ? 'Write a reply…' : 'Write a comment…'}
-        className="w-full resize-none rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-indigo-500 focus:outline-none"
+        className="w-full resize-none rounded-xl border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all"
       />
       {error && <p className="text-xs text-red-400">{error}</p>}
       <button
         type="submit"
         disabled={isPending}
-        className="rounded-lg bg-indigo-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
+        className="rounded-xl bg-violet-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-violet-500 disabled:opacity-50 transition-colors"
       >
         {isPending ? 'Posting…' : parentId ? 'Reply' : 'Comment'}
       </button>

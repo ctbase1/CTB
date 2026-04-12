@@ -2,6 +2,7 @@
 
 import { useOptimistic, useTransition } from 'react'
 import { toggleSaved } from '@/lib/actions/saved'
+import { Bookmark } from 'lucide-react'
 
 interface Props {
   postId: string
@@ -27,9 +28,11 @@ export function BookmarkButton({ postId, isSaved }: Props) {
     <button
       onClick={handleClick}
       title={optimisticSaved ? 'Remove bookmark' : 'Save post'}
-      className="flex h-7 w-7 items-center justify-center rounded-full text-sm transition-colors hover:bg-zinc-700"
+      className={`flex h-7 w-7 items-center justify-center rounded-full transition-all hover:bg-slate-800 ${
+        optimisticSaved ? 'text-violet-400' : 'text-slate-500 hover:text-slate-300'
+      }`}
     >
-      {optimisticSaved ? '🔖' : '🏷️'}
+      <Bookmark className={`h-4 w-4 transition-all ${optimisticSaved ? 'fill-violet-400' : ''}`} />
     </button>
   )
 }

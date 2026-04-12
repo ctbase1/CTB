@@ -133,15 +133,15 @@ export default async function HomePage({ searchParams }: Props) {
     <div className="space-y-6">
       {/* Tab nav */}
       <div className="flex items-center justify-between">
-        <div className="flex gap-1 rounded-xl border border-zinc-800 bg-zinc-900 p-1">
+        <div className="flex gap-1 rounded-2xl border border-slate-700/50 bg-slate-900 p-1">
           {TABS.map(t => (
             <Link
               key={t.id}
               href={`/?tab=${t.id}`}
-              className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
                 tab === t.id
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-zinc-400 hover:text-white'
+                  ? 'bg-violet-600 text-white shadow-glow-violet-sm'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               {t.label}
@@ -149,7 +149,7 @@ export default async function HomePage({ searchParams }: Props) {
           ))}
         </div>
         {user && (
-          <Link href="/c/new" className="text-sm text-indigo-400 hover:underline">
+          <Link href="/c/new" className="text-sm text-violet-400 hover:underline">
             + Create
           </Link>
         )}
@@ -159,15 +159,15 @@ export default async function HomePage({ searchParams }: Props) {
       {tab === 'feed' && (
         <div className="space-y-3">
           {myIds.length === 0 ? (
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-8 text-center">
-              <p className="text-zinc-400 mb-2">You haven&apos;t joined any communities yet.</p>
-              <Link href="/?tab=communities" className="text-sm text-indigo-400 hover:underline">
+            <div className="rounded-xl border border-slate-700/50 bg-slate-900 p-8 text-center">
+              <p className="text-slate-400 mb-2">You haven&apos;t joined any communities yet.</p>
+              <Link href="/?tab=communities" className="text-sm text-violet-400 hover:underline">
                 Browse communities →
               </Link>
             </div>
           ) : posts.length === 0 ? (
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-8 text-center">
-              <p className="text-zinc-400">No posts yet in your communities.</p>
+            <div className="rounded-xl border border-slate-700/50 bg-slate-900 p-8 text-center">
+              <p className="text-slate-400">No posts yet in your communities.</p>
             </div>
           ) : (
             posts.map(p => (
@@ -189,8 +189,8 @@ export default async function HomePage({ searchParams }: Props) {
       {tab === 'all' && (
         <div className="space-y-3">
           {posts.length === 0 ? (
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-8 text-center">
-              <p className="text-zinc-400">No posts yet.</p>
+            <div className="rounded-xl border border-slate-700/50 bg-slate-900 p-8 text-center">
+              <p className="text-slate-400">No posts yet.</p>
             </div>
           ) : (
             posts.map(p => (
@@ -212,10 +212,10 @@ export default async function HomePage({ searchParams }: Props) {
       {tab === 'communities' && (
         <div className="space-y-2">
           {allCommunities.length === 0 ? (
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900 py-16 text-center">
-              <p className="mb-4 text-sm text-zinc-500">No communities yet.</p>
+            <div className="rounded-xl border border-slate-700/50 bg-slate-900 py-16 text-center">
+              <p className="mb-4 text-sm text-slate-500">No communities yet.</p>
               {user && (
-                <Link href="/c/new" className="text-sm text-indigo-400 hover:underline">
+                <Link href="/c/new" className="text-sm text-violet-400 hover:underline">
                   Be the first to create one →
                 </Link>
               )}
