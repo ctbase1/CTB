@@ -1,9 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
-import { deleteCommunity } from './actions'
 import { CommunitySettingsForm } from './community-settings-form'
-import { Button } from '@/components/ui/button'
+import { DeleteCommunityButton } from './delete-community-button'
 
 interface Props {
   params: { slug: string }
@@ -61,11 +60,7 @@ export default async function CommunitySettingsPage({ params, searchParams }: Pr
         <p className="text-xs text-zinc-500 mb-4">
           Deleting the community hides it from all users. This cannot be undone.
         </p>
-        <form action={deleteCommunity}>
-          <input type="hidden" name="communityId" value={community.id} />
-          <input type="hidden" name="slug"        value={community.slug} />
-          <Button type="submit" variant="danger">Delete Community</Button>
-        </form>
+        <DeleteCommunityButton communityId={community.id} slug={community.slug} />
       </div>
     </div>
   )

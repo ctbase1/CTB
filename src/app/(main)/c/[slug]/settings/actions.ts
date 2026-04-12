@@ -28,7 +28,7 @@ export async function updateCommunity(formData: FormData) {
 
   const name        = (formData.get('name') as string).trim()
   const description = (formData.get('description') as string).trim()
-  const banner_url  = formData.get('banner_url') as string | null
+  const banner_url  = (formData.get('banner_url') as string) || null
 
   if (name.length < 3) {
     redirect(`/c/${slug}/settings?error=` + encodeURIComponent('Name must be at least 3 characters'))
@@ -42,7 +42,7 @@ export async function updateCommunity(formData: FormData) {
     .update({
       name,
       description: description || null,
-      ...(banner_url ? { banner_url } : {}),
+      banner_url,
     })
     .eq('id', communityId)
 
