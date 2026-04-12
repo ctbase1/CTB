@@ -5,57 +5,68 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 export async function createPost(formData: FormData) {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  let slug = ''
+  try {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) redirect('/login')
 
-  const slug      = formData.get('community_slug') as string
-  const title     = ((formData.get('title') as string) ?? '').trim()
-  const body      = ((formData.get('body') as string) ?? '').trim() || null
-  const image_url = (formData.get('image_url') as string) || null
+    slug        = formData.get('community_slug') as string
+    const title     = ((formData.get('title') as string) ?? '').trim()
+    const body      = ((formData.get('body') as string) ?? '').trim() || null
+    const image_url = (formData.get('image_url') as string) || null
 
-  if (title.length < 3) {
-    redirect(`/c/${slug}/submit?error=` + encodeURIComponent('Title must be at least 3 characters'))
+    if (title.length < 3) {
+      redirect(`/c/${slug}/submit?error=` + encodeURIComponent('Title must be at least 3 characters'))
+    }
+    if (title.length > 300) {
+      redirect(`/c/${slug}/submit?error=` + encodeURIComponent('Title must be under 300 characters'))
+    }
+    if (image_url && !image_url.startsWith('https://res.cloudinary.com/')) {
+      redirect(`/c/${slug}/submit?error=` + encodeURIComponent('Invalid image URL'))
+    }
+
+    const { data: community } = await supabase
+      .from('communities')
+      .select('id')
+      .eq('slug', slug)
+      .eq('is_removed', false)
+      .single()
+
+    if (!community) redirect('/')
+
+    const { data: membership } = await supabase
+      .from('memberships')
+      .select('role')
+      .eq('community_id', community.id)
+      .eq('user_id', user.id)
+      .single()
+
+    if (!membership) {
+      redirect(`/c/${slug}/submit?error=` + encodeURIComponent('You must be a member to post'))
+    }
+
+    const { data: post, error } = await supabase
+      .from('posts')
+      .insert({ community_id: community.id, author_id: user.id, title, body, image_url })
+      .select('id')
+      .single()
+
+    if (error || !post) {
+      redirect(`/c/${slug}/submit?error=` + encodeURIComponent(error?.message ?? 'Failed to create post'))
+    }
+
+    revalidatePath(`/c/${slug}`)
+    redirect(`/c/${slug}/${post.id}`)
+  } catch (err: unknown) {
+    // Re-throw Next.js redirect/notFound errors — they must not be swallowed
+    if (err instanceof Error && err.message === 'NEXT_REDIRECT') throw err
+    if (typeof err === 'object' && err !== null && 'digest' in err) throw err
+
+    const message = err instanceof Error ? err.message : 'Unexpected error'
+    console.error('[createPost]', message)
+    redirect(`/c/${slug}/submit?error=` + encodeURIComponent(message))
   }
-  if (title.length > 300) {
-    redirect(`/c/${slug}/submit?error=` + encodeURIComponent('Title must be under 300 characters'))
-  }
-  if (image_url && !image_url.startsWith('https://res.cloudinary.com/')) {
-    redirect(`/c/${slug}/submit?error=` + encodeURIComponent('Invalid image URL'))
-  }
-
-  const { data: community } = await supabase
-    .from('communities')
-    .select('id')
-    .eq('slug', slug)
-    .eq('is_removed', false)
-    .single()
-
-  if (!community) redirect('/')
-
-  const { data: membership } = await supabase
-    .from('memberships')
-    .select('role')
-    .eq('community_id', community.id)
-    .eq('user_id', user.id)
-    .single()
-
-  if (!membership) {
-    redirect(`/c/${slug}/submit?error=` + encodeURIComponent('You must be a member to post'))
-  }
-
-  const { data: post, error } = await supabase
-    .from('posts')
-    .insert({ community_id: community.id, author_id: user.id, title, body, image_url })
-    .select('id')
-    .single()
-
-  if (error || !post) {
-    redirect(`/c/${slug}/submit?error=` + encodeURIComponent(error?.message ?? 'Failed to create post'))
-  }
-
-  revalidatePath(`/c/${slug}`)
-  redirect(`/c/${slug}/${post.id}`)
 }
 
 export async function deletePost(formData: FormData) {
