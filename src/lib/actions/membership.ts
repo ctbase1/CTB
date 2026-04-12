@@ -9,8 +9,9 @@ export async function joinCommunity(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const communityId   = formData.get('communityId') as string
-  const communitySlug = formData.get('communitySlug') as string
+  const communityId   = formData.get('communityId') as string | null
+  const communitySlug = formData.get('communitySlug') as string | null
+  if (!communityId || !communitySlug) redirect('/')
 
   await supabase.from('memberships').insert({
     user_id: user.id,
@@ -29,8 +30,9 @@ export async function leaveCommunity(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const communityId   = formData.get('communityId') as string
-  const communitySlug = formData.get('communitySlug') as string
+  const communityId   = formData.get('communityId') as string | null
+  const communitySlug = formData.get('communitySlug') as string | null
+  if (!communityId || !communitySlug) redirect('/')
 
   // Verify not admin (RLS also enforces, but check here for a clear error)
   const { data: membership } = await supabase
