@@ -5,6 +5,27 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { slugify } from '@/lib/utils'
 
+export async function adminToggleCommunityRemoved(communityId: string, remove: boolean) {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_platform_admin')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile?.is_platform_admin) return
+
+  await supabase
+    .from('communities')
+    .update({ is_removed: remove })
+    .eq('id', communityId)
+
+  revalidatePath('/admin/communities')
+}
+
 export async function createCommunity(formData: FormData) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()

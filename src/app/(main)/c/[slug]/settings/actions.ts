@@ -30,6 +30,20 @@ export async function updateCommunity(formData: FormData) {
   const description = (formData.get('description') as string).trim()
   const banner_url  = (formData.get('banner_url') as string) || null
 
+  // Flairs: comma-separated string → trimmed, non-empty string array
+  const flairsRaw     = (formData.get('allowed_flairs') as string) ?? ''
+  const allowed_flairs = flairsRaw
+    .split(',')
+    .map(f => f.trim())
+    .filter(Boolean)
+
+  // Rules: JSON array serialized from the client
+  let rules: { title: string; body: string }[] = []
+  try {
+    const rulesRaw = formData.get('rules') as string
+    if (rulesRaw) rules = JSON.parse(rulesRaw)
+  } catch { /* ignore malformed input */ }
+
   if (name.length < 3) {
     redirect(`/c/${slug}/settings?error=` + encodeURIComponent('Name must be at least 3 characters'))
   }
@@ -43,6 +57,8 @@ export async function updateCommunity(formData: FormData) {
       name,
       description: description || null,
       banner_url,
+      allowed_flairs,
+      rules,
     })
     .eq('id', communityId)
 

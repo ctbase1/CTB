@@ -35,9 +35,11 @@ export function AvatarUpload({ currentUrl, onUpload }: AvatarUploadProps) {
 
   return (
     <div className="flex flex-col items-center gap-3">
-      <div
+      <button
+        type="button"
         onClick={() => inputRef.current?.click()}
-        className="relative h-24 w-24 cursor-pointer overflow-hidden rounded-full bg-zinc-800 ring-2 ring-zinc-700 hover:ring-indigo-500"
+        aria-label="Upload avatar"
+        className="relative h-24 w-24 cursor-pointer overflow-hidden rounded-full bg-zinc-800 ring-2 ring-zinc-700 hover:ring-indigo-500 focus:outline-none focus:ring-indigo-500"
       >
         {preview ? (
           <Image src={preview} alt="Avatar" fill className="object-cover" />
@@ -51,7 +53,7 @@ export function AvatarUpload({ currentUrl, onUpload }: AvatarUploadProps) {
             <span className="h-6 w-6 animate-spin rounded-full border-2 border-white border-t-transparent" />
           </div>
         )}
-      </div>
+      </button>
 
       <input
         ref={inputRef}

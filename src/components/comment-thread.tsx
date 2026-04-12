@@ -23,7 +23,7 @@ export function CommentThread({ comments, postId, communityId, communitySlug, us
 
   if (topLevel.length === 0) {
     return (
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900 py-10 text-center">
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900 py-16 text-center">
         <p className="text-sm text-zinc-500">No comments yet. Be the first!</p>
       </div>
     )

@@ -24,7 +24,8 @@ export function BanFromCommunityButton({ communityId, communitySlug, userId, use
     <button
       onClick={handleClick}
       disabled={isPending}
-      className="text-xs text-zinc-600 hover:text-orange-400 disabled:opacity-50"
+      aria-label={`Ban ${username} from this community`}
+      className="text-xs text-zinc-600 hover:text-red-400 disabled:opacity-50"
     >
       {isPending ? 'Banning…' : 'Ban'}
     </button>

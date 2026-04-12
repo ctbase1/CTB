@@ -20,6 +20,7 @@ export function LikeButton({
 }: Props) {
   const [liked, setLiked] = useState(initialLiked)
   const [count, setCount] = useState(initialCount)
+  const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
   function handleClick() {
@@ -27,23 +28,32 @@ export function LikeButton({
     const wasLiked = liked
     setLiked(!wasLiked)
     setCount(c => (wasLiked ? c - 1 : c + 1))
+    setError(null)
     startTransition(async () => {
-      await toggleLike(targetId, targetType)
+      const result = await toggleLike(targetId, targetType)
+      if (result.error) {
+        setLiked(wasLiked)
+        setCount(c => (wasLiked ? c + 1 : c - 1))
+        setError(result.error)
+      }
     })
   }
 
   return (
-    <button
-      onClick={handleClick}
-      disabled={!userId || isPending}
-      className={`flex items-center gap-1.5 text-sm transition-colors disabled:opacity-50 ${
-        liked
-          ? 'text-indigo-400'
-          : 'text-zinc-500 hover:text-zinc-300'
-      }`}
-    >
-      <span>{liked ? '♥' : '♡'}</span>
-      <span>{count}</span>
-    </button>
+    <div className="flex flex-col items-start gap-0.5">
+      <button
+        onClick={handleClick}
+        disabled={!userId || isPending}
+        className={`flex items-center gap-1.5 text-sm transition-colors disabled:opacity-50 ${
+          liked
+            ? 'text-indigo-400'
+            : 'text-zinc-500 hover:text-zinc-300'
+        }`}
+      >
+        <span>{liked ? '♥' : '♡'}</span>
+        <span>{count}</span>
+      </button>
+      {error && <span className="text-xs text-red-400">{error}</span>}
+    </div>
   )
 }

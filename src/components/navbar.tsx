@@ -54,6 +54,9 @@ export function Navbar({ profile, unreadCount }: NavbarProps) {
               </span>
             )}
           </Link>
+          <Link href="/saved" className="text-sm text-zinc-400 hover:text-white">
+            Saved
+          </Link>
           <Link href={`/u/${profile.username}`} className="text-sm text-zinc-400 hover:text-white">
             {profile.username}
           </Link>
@@ -95,6 +98,9 @@ export function Navbar({ profile, unreadCount }: NavbarProps) {
         <div className="sm:hidden border-t border-zinc-800 mt-3 pt-3 pb-2 space-y-1 px-4">
           <Link href="/c/new" onClick={() => setMenuOpen(false)} className="block py-2 text-sm text-zinc-300 hover:text-white">
             + Create Community
+          </Link>
+          <Link href="/saved" onClick={() => setMenuOpen(false)} className="block py-2 text-sm text-zinc-300 hover:text-white">
+            Saved Posts
           </Link>
           <Link href={`/u/${profile.username}`} onClick={() => setMenuOpen(false)} className="block py-2 text-sm text-zinc-300 hover:text-white">
             Profile ({profile.username})

@@ -34,6 +34,7 @@ export function ReportButton({ targetId, targetType }: Props) {
     <div className="relative">
       <button
         onClick={() => setOpen(v => !v)}
+        aria-label={`Report this ${targetType}`}
         className="text-xs text-zinc-600 hover:text-zinc-400"
       >
         Report

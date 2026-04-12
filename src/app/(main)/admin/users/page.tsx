@@ -27,9 +27,14 @@ export default async function AdminUsersPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-xl font-bold text-white">Users</h1>
-        <Link href="/admin/reports" className="text-sm text-zinc-400 hover:text-white">
-          ← Reports
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/admin/communities" className="text-sm text-zinc-400 hover:text-white">
+            Communities →
+          </Link>
+          <Link href="/admin/reports" className="text-sm text-zinc-400 hover:text-white">
+            Reports →
+          </Link>
+        </div>
       </div>
 
       <div className="space-y-2">

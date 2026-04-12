@@ -1,16 +1,31 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { useFormStatus } from 'react-dom'
 import Image from 'next/image'
 import { uploadToCloudinary } from '@/lib/cloudinary'
 import { createPost } from '@/lib/actions/post'
 
+function SubmitButton({ disabled }: { disabled?: boolean }) {
+  const { pending } = useFormStatus()
+  return (
+    <button
+      type="submit"
+      disabled={disabled || pending}
+      className="w-full rounded-lg bg-indigo-600 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
+    >
+      {pending ? 'Posting…' : 'Post'}
+    </button>
+  )
+}
+
 interface Props {
   communitySlug: string
+  communityFlairs?: string[]
   error?: string | null
 }
 
-export function CreatePostForm({ communitySlug, error: initialError }: Props) {
+export function CreatePostForm({ communitySlug, communityFlairs = [], error: initialError }: Props) {
   const [imageUrl, setImageUrl]       = useState<string | null>(null)
   const [uploading, setUploading]     = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
@@ -54,6 +69,21 @@ export function CreatePostForm({ communitySlug, error: initialError }: Props) {
           className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-indigo-500 focus:outline-none"
         />
       </div>
+
+      {communityFlairs.length > 0 && (
+        <div>
+          <label className="mb-1 block text-sm font-medium text-zinc-300">Flair</label>
+          <select
+            name="flair"
+            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
+          >
+            <option value="">— No flair —</option>
+            {communityFlairs.map(f => (
+              <option key={f} value={f}>{f}</option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div>
         <label className="mb-1 block text-sm font-medium text-zinc-300">Body</label>
@@ -101,13 +131,7 @@ export function CreatePostForm({ communitySlug, error: initialError }: Props) {
         )}
       </div>
 
-      <button
-        type="submit"
-        disabled={uploading}
-        className="w-full rounded-lg bg-indigo-600 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
-      >
-        Post
-      </button>
+      <SubmitButton disabled={uploading} />
     </form>
   )
 }

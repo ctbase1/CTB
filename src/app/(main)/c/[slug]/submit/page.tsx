@@ -15,7 +15,7 @@ export default async function SubmitPage({ params, searchParams }: Props) {
 
   const { data: community } = await supabase
     .from('communities')
-    .select('id, name, slug')
+    .select('id, name, slug, allowed_flairs')
     .eq('slug', params.slug)
     .eq('is_removed', false)
     .single()
@@ -44,6 +44,7 @@ export default async function SubmitPage({ params, searchParams }: Props) {
       </div>
       <CreatePostForm
         communitySlug={community.slug}
+        communityFlairs={community.allowed_flairs}
         error={searchParams.error ?? null}
       />
     </div>

@@ -28,9 +28,14 @@ export default async function AdminReportsPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-xl font-bold text-white">Open Reports</h1>
-        <Link href="/admin/users" className="text-sm text-zinc-400 hover:text-white">
-          Users →
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/admin/users" className="text-sm text-zinc-400 hover:text-white">
+            Users →
+          </Link>
+          <Link href="/admin/communities" className="text-sm text-zinc-400 hover:text-white">
+            Communities →
+          </Link>
+        </div>
       </div>
 
       {reports.length === 0 ? (

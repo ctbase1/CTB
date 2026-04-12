@@ -41,6 +41,7 @@ export type Database = {
     Tables: {
       communities: {
         Row: {
+          allowed_flairs: string[]
           banner_url: string | null
           created_at: string
           created_by: string
@@ -48,9 +49,11 @@ export type Database = {
           id: string
           is_removed: boolean
           name: string
+          rules: { title: string; body: string }[]
           slug: string
         }
         Insert: {
+          allowed_flairs?: string[]
           banner_url?: string | null
           created_at?: string
           created_by: string
@@ -58,9 +61,11 @@ export type Database = {
           id?: string
           is_removed?: boolean
           name: string
+          rules?: { title: string; body: string }[]
           slug: string
         }
         Update: {
+          allowed_flairs?: string[]
           banner_url?: string | null
           created_at?: string
           created_by?: string
@@ -68,6 +73,7 @@ export type Database = {
           id?: string
           is_removed?: boolean
           name?: string
+          rules?: { title: string; body: string }[]
           slug?: string
         }
         Relationships: [
@@ -274,6 +280,7 @@ export type Database = {
           id: string
           is_banned: boolean
           is_platform_admin: boolean
+          notification_prefs: { comments: boolean; replies: boolean; likes: boolean; follows: boolean } | null
           username: string
         }
         Insert: {
@@ -283,6 +290,7 @@ export type Database = {
           id: string
           is_banned?: boolean
           is_platform_admin?: boolean
+          notification_prefs?: { comments: boolean; replies: boolean; likes: boolean; follows: boolean } | null
           username: string
         }
         Update: {
@@ -292,6 +300,7 @@ export type Database = {
           id?: string
           is_banned?: boolean
           is_platform_admin?: boolean
+          notification_prefs?: { comments: boolean; replies: boolean; likes: boolean; follows: boolean } | null
           username?: string
         }
         Relationships: []
@@ -340,6 +349,39 @@ export type Database = {
             columns: ["resolved_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saved_posts: {
+        Row: {
+          post_id: string
+          saved_at: string
+          user_id: string
+        }
+        Insert: {
+          post_id: string
+          saved_at?: string
+          user_id: string
+        }
+        Update: {
+          post_id?: string
+          saved_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saved_posts_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
             referencedColumns: ["id"]
           },
         ]
@@ -402,9 +444,13 @@ export type Database = {
           body: string | null
           community_id: string
           created_at: string
+          edited_at: string | null
+          flair: string | null
           id: string
           image_url: string | null
+          is_pinned: boolean
           is_removed: boolean
+          link_preview: { title: string | null; description: string | null; image_url: string | null; url: string } | null
           title: string
         }
         Insert: {
@@ -412,9 +458,13 @@ export type Database = {
           body?: string | null
           community_id: string
           created_at?: string
+          edited_at?: string | null
+          flair?: string | null
           id?: string
           image_url?: string | null
+          is_pinned?: boolean
           is_removed?: boolean
+          link_preview?: { title: string | null; description: string | null; image_url: string | null; url: string } | null
           title: string
         }
         Update: {
@@ -422,9 +472,13 @@ export type Database = {
           body?: string | null
           community_id?: string
           created_at?: string
+          edited_at?: string | null
+          flair?: string | null
           id?: string
           image_url?: string | null
+          is_pinned?: boolean
           is_removed?: boolean
+          link_preview?: { title: string | null; description: string | null; image_url: string | null; url: string } | null
           title?: string
         }
         Relationships: [
@@ -601,3 +655,4 @@ export type Follow = Database['public']['Tables']['follows']['Row']
 export type Report = Database['public']['Tables']['reports']['Row']
 export type CommunityBan = Database['public']['Tables']['community_bans']['Row']
 export type Notification = Database['public']['Tables']['notifications']['Row']
+export type SavedPost = Database['public']['Tables']['saved_posts']['Row']
