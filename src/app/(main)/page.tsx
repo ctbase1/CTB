@@ -30,20 +30,25 @@ export default async function HomePage() {
 
       // Preserve join order
       const communityById = new Map((communities ?? []).map(c => [c.id, c]))
-      myCommunities = ids.map(id => communityById.get(id)!).filter(Boolean)
+      myCommunities = ids.flatMap(id => { const c = communityById.get(id); return c ? [c] : [] })
     }
   }
 
-  // Discover: all communities not already joined, newest first
-  const myIds = new Set(myCommunities.map(c => c.id))
-  const { data: allCommunities } = await supabase
+  // Discover: communities not already joined, newest first
+  const myIds = myCommunities.map(c => c.id)
+  let discoverQuery = supabase
     .from('communities')
     .select('*')
     .eq('is_removed', false)
     .order('created_at', { ascending: false })
     .limit(20)
 
-  const discoverCommunities = (allCommunities ?? []).filter(c => !myIds.has(c.id))
+  if (myIds.length > 0) {
+    discoverQuery = discoverQuery.not('id', 'in', `(${myIds.join(',')})`)
+  }
+
+  const { data: rawDiscover } = await discoverQuery
+  const discoverCommunities = rawDiscover ?? []
 
   return (
     <div className="space-y-10">
