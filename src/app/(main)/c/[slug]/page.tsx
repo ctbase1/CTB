@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { JoinButton } from '@/components/join-button'
+import { PostCard } from '@/components/post-card'
 import type { Membership } from '@/types/database'
 
 interface Props {
@@ -29,7 +30,7 @@ export default async function CommunityPage({ params, searchParams }: Props) {
     .select('*', { count: 'exact', head: true })
     .eq('community_id', community.id)
 
-  // Current user's membership
+  // Current user membership
   let membership: Pick<Membership, 'role'> | null = null
   if (user) {
     const { data } = await supabase
@@ -41,14 +42,51 @@ export default async function CommunityPage({ params, searchParams }: Props) {
     membership = data
   }
 
+  // Fetch posts with author
+  const { data: rawPosts } = await supabase
+    .from('posts')
+    .select('*, author:profiles!author_id(username)')
+    .eq('community_id', community.id)
+    .eq('is_removed', false)
+    .order('created_at', { ascending: false })
+    .limit(20)
+
+  const posts = rawPosts ?? []
+  const postIds = posts.map(p => p.id)
+
+  // Bulk like + comment counts
+  const likeCountMap    = new Map<string, number>()
+  const commentCountMap = new Map<string, number>()
+
+  if (postIds.length > 0) {
+    const [{ data: likeRows }, { data: commentRows }] = await Promise.all([
+      supabase
+        .from('likes')
+        .select('target_id')
+        .eq('target_type', 'post')
+        .in('target_id', postIds),
+      supabase
+        .from('comments')
+        .select('post_id')
+        .eq('is_removed', false)
+        .in('post_id', postIds),
+    ])
+    for (const { target_id } of likeRows ?? []) {
+      likeCountMap.set(target_id, (likeCountMap.get(target_id) ?? 0) + 1)
+    }
+    for (const { post_id } of commentRows ?? []) {
+      commentCountMap.set(post_id, (commentCountMap.get(post_id) ?? 0) + 1)
+    }
+  }
+
   const isAdmin = membership?.role === 'admin'
-  const count = memberCount ?? 0
+  const count   = memberCount ?? 0
 
   return (
     <div>
       {/* Banner */}
       {community.banner_url && (
-        <div className="relative h-32 w-full overflow-hidden rounded-xl bg-zinc-800 mb-4">
+        <div className="relative mb-4 h-32 w-full overflow-hidden rounded-xl bg-zinc-800">
           <Image src={community.banner_url} alt={community.name} fill className="object-cover" />
         </div>
       )}
@@ -57,19 +95,16 @@ export default async function CommunityPage({ params, searchParams }: Props) {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">{community.name}</h1>
-          <p className="text-sm text-zinc-400 mt-0.5">
+          <p className="mt-0.5 text-sm text-zinc-400">
             c/{community.slug} · {count} {count === 1 ? 'member' : 'members'}
           </p>
           {community.description && (
-            <p className="mt-3 text-sm text-zinc-300 max-w-lg">{community.description}</p>
+            <p className="mt-3 max-w-lg text-sm text-zinc-300">{community.description}</p>
           )}
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex shrink-0 items-center gap-2">
           {isAdmin && (
-            <Link
-              href={`/c/${community.slug}/settings`}
-              className="text-xs text-zinc-400 hover:text-white"
-            >
+            <Link href={`/c/${community.slug}/settings`} className="text-xs text-zinc-400 hover:text-white">
               Settings
             </Link>
           )}
@@ -88,9 +123,52 @@ export default async function CommunityPage({ params, searchParams }: Props) {
         </p>
       )}
 
-      {/* Posts placeholder */}
-      <div className="mt-10 rounded-xl border border-zinc-800 bg-zinc-900 py-16 text-center">
-        <p className="text-zinc-500 text-sm">Posts coming in Phase 3.</p>
+      {/* Posts feed */}
+      <div className="mt-8">
+        <div className="mb-4 flex items-center justify-between">
+          <p className="text-sm font-medium text-zinc-400">
+            {posts.length > 0
+              ? `${posts.length} post${posts.length === 1 ? '' : 's'}`
+              : 'Posts'}
+          </p>
+          {membership && (
+            <Link
+              href={`/c/${community.slug}/submit`}
+              className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-500"
+            >
+              New Post
+            </Link>
+          )}
+        </div>
+
+        {posts.length === 0 ? (
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900 py-16 text-center">
+            <p className="text-sm text-zinc-500">No posts yet.</p>
+            {membership && (
+              <Link
+                href={`/c/${community.slug}/submit`}
+                className="mt-2 inline-block text-sm text-indigo-400 hover:underline"
+              >
+                Be the first to post →
+              </Link>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {posts.map(p => (
+              <PostCard
+                key={p.id}
+                post={{
+                  ...p,
+                  author: p.author as { username: string } | null,
+                }}
+                likeCount={likeCountMap.get(p.id) ?? 0}
+                commentCount={commentCountMap.get(p.id) ?? 0}
+                communitySlug={community.slug}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

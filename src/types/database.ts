@@ -80,6 +80,35 @@ export type Database = {
           },
         ]
       }
+      likes: {
+        Row: {
+          created_at: string
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          target_id?: string
+          target_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       memberships: {
         Row: {
           community_id: string
@@ -146,6 +175,106 @@ export type Database = {
         }
         Relationships: []
       }
+      comments: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          id: string
+          is_removed: boolean
+          parent_id: string | null
+          post_id: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          id?: string
+          is_removed?: boolean
+          parent_id?: string | null
+          post_id: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          is_removed?: boolean
+          parent_id?: string | null
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          author_id: string
+          body: string | null
+          community_id: string
+          created_at: string
+          id: string
+          image_url: string | null
+          is_removed: boolean
+          title: string
+        }
+        Insert: {
+          author_id: string
+          body?: string | null
+          community_id: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_removed?: boolean
+          title: string
+        }
+        Update: {
+          author_id?: string
+          body?: string | null
+          community_id?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_removed?: boolean
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_community_id_fkey"
+            columns: ["community_id"]
+            isOneToOne: false
+            referencedRelation: "communities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -156,6 +285,7 @@ export type Database = {
     Enums: {
       membership_role: "admin" | "moderator" | "member"
     }
+
     CompositeTypes: {
       [_ in never]: never
     }
@@ -295,3 +425,6 @@ export type Profile = Database['public']['Tables']['profiles']['Row']
 export type Community = Database['public']['Tables']['communities']['Row']
 export type Membership = Database['public']['Tables']['memberships']['Row']
 export type MembershipRole = Database['public']['Enums']['membership_role']
+export type Post = Database['public']['Tables']['posts']['Row']
+export type Comment = Database['public']['Tables']['comments']['Row']
+export type Like = Database['public']['Tables']['likes']['Row']

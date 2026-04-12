@@ -63,7 +63,7 @@ export default async function HomePage() {
 
         {myCommunities.length === 0 ? (
           <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-8 text-center">
-            <p className="text-zinc-400 mb-2">You haven't joined any communities yet.</p>
+            <p className="text-zinc-400 mb-2">You haven&apos;t joined any communities yet.</p>
             <p className="text-sm text-zinc-500">Discover communities below to get started.</p>
           </div>
         ) : (
