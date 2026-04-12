@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { CommunitySettingsForm } from './community-settings-form'
 import { DeleteCommunityButton } from './delete-community-button'
+import { ModeratorSection } from './moderator-section'
 
 interface Props {
   params: { slug: string }
@@ -32,6 +33,20 @@ export default async function CommunitySettingsPage({ params, searchParams }: Pr
 
   if (membership?.role !== 'admin') redirect(`/c/${params.slug}`)
 
+  // Fetch members for moderator delegation UI
+  const { data: memberships } = await supabase
+    .from('memberships')
+    .select('role, user_id, profiles:profiles!user_id(username, avatar_url)')
+    .eq('community_id', community.id)
+    .neq('role', 'admin')
+
+  const members = (memberships ?? []).map(m => ({
+    userId:     m.user_id,
+    role:       m.role,
+    username:   (m.profiles as { username: string; avatar_url: string | null } | null)?.username ?? 'unknown',
+    avatarUrl:  (m.profiles as { username: string; avatar_url: string | null } | null)?.avatar_url ?? null,
+  }))
+
   return (
     <div className="max-w-md">
       <div className="flex items-center gap-3 mb-6">
@@ -53,6 +68,15 @@ export default async function CommunitySettingsPage({ params, searchParams }: Pr
       )}
 
       <CommunitySettingsForm community={community} />
+
+      {/* Moderators */}
+      <div className="mt-10">
+        <ModeratorSection
+          communityId={community.id}
+          communitySlug={params.slug}
+          members={members}
+        />
+      </div>
 
       {/* Danger zone */}
       <div className="mt-10 rounded-xl border border-red-900/40 p-6">

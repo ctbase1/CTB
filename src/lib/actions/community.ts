@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { slugify } from '@/lib/utils'
+import { sanitizeText } from '@/lib/sanitize'
 
 export async function adminToggleCommunityRemoved(communityId: string, remove: boolean) {
   const supabase = createClient()
@@ -31,16 +32,16 @@ export async function createCommunity(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const name        = ((formData.get('name') as string) ?? '').trim()
-  const description = ((formData.get('description') as string) ?? '').trim()
+  let name: string
+  try {
+    name = sanitizeText((formData.get('name') as string) ?? '', { min: 3, max: 100 })
+  } catch (e) {
+    redirect('/c/new?error=' + encodeURIComponent((e as Error).message))
+  }
+  const rawDesc    = ((formData.get('description') as string) ?? '').trim()
+  const description = rawDesc ? rawDesc.slice(0, 300) : ''
   const banner_url  = (formData.get('banner_url') as string) || null
 
-  if (name.length < 3) {
-    redirect('/c/new?error=' + encodeURIComponent('Community name must be at least 3 characters'))
-  }
-  if (name.length > 100) {
-    redirect('/c/new?error=' + encodeURIComponent('Community name must be under 100 characters'))
-  }
   if (banner_url && !banner_url.startsWith('https://res.cloudinary.com/')) {
     redirect('/c/new?error=' + encodeURIComponent('Invalid banner URL'))
   }

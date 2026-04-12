@@ -3,11 +3,15 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { sanitizeText, sanitizeUrl } from '@/lib/sanitize'
+import { createAuditLog } from '@/lib/audit'
 
 const URL_REGEX = /https?:\/\/[^\s"'<>]+/i
 
 async function fetchLinkPreview(url: string) {
   try {
+    // Validate URL before fetching to prevent SSRF
+    sanitizeUrl(url)
     const res = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CBTBot/1.0)' },
       signal: AbortSignal.timeout(4000),
@@ -38,17 +42,17 @@ export async function createPost(formData: FormData) {
     if (!user) redirect('/login')
 
     slug        = formData.get('community_slug') as string
-    const title     = ((formData.get('title') as string) ?? '').trim()
-    const body      = ((formData.get('body') as string) ?? '').trim() || null
+    let title: string
+    try {
+      title = sanitizeText((formData.get('title') as string) ?? '', { min: 3, max: 300 })
+    } catch (e) {
+      redirect(`/c/${slug}/submit?error=` + encodeURIComponent((e as Error).message))
+    }
+    const rawBody   = ((formData.get('body') as string) ?? '').trim()
+    const body      = rawBody ? sanitizeText(rawBody, { min: 0, max: 10000 }) || null : null
     const image_url = (formData.get('image_url') as string) || null
     const flair     = (formData.get('flair') as string) || null
 
-    if (title.length < 3) {
-      redirect(`/c/${slug}/submit?error=` + encodeURIComponent('Title must be at least 3 characters'))
-    }
-    if (title.length > 300) {
-      redirect(`/c/${slug}/submit?error=` + encodeURIComponent('Title must be under 300 characters'))
-    }
     if (image_url && !image_url.startsWith('https://res.cloudinary.com/')) {
       redirect(`/c/${slug}/submit?error=` + encodeURIComponent('Invalid image URL'))
     }
@@ -141,6 +145,13 @@ export async function deletePost(formData: FormData) {
   }
 
   await supabase.from('posts').update({ is_removed: true }).eq('id', postId)
+
+  await createAuditLog(supabase, {
+    actorId:     user.id,
+    action:      'delete_post',
+    targetType:  'post',
+    targetId:    postId,
+  })
 
   revalidatePath(`/c/${communitySlug}`)
   redirect(`/c/${communitySlug}`)

@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createNotification } from '@/lib/notifications'
+import { sanitizeText } from '@/lib/sanitize'
+import { createAuditLog } from '@/lib/audit'
 
 export async function createComment(
   formData: FormData
@@ -14,12 +16,15 @@ export async function createComment(
 
   const postId        = formData.get('post_id') as string
   const parentId      = (formData.get('parent_id') as string) || null
-  const body          = ((formData.get('body') as string) ?? '').trim()
   const communitySlug = formData.get('community_slug') as string
 
-  if (!body)              return { error: 'Comment cannot be empty' }
-  if (body.length > 2000) return { error: 'Comment must be under 2000 characters' }
-  if (!postId)            return { error: 'Invalid post' }
+  let body: string
+  try {
+    body = sanitizeText((formData.get('body') as string) ?? '', { min: 1, max: 2000 })
+  } catch (e) {
+    return { error: (e as Error).message }
+  }
+  if (!postId) return { error: 'Invalid post' }
 
   const { data: post } = await supabase
     .from('posts')
@@ -115,6 +120,13 @@ export async function deleteComment(formData: FormData) {
   }
 
   await supabase.from('comments').update({ is_removed: true }).eq('id', commentId)
+
+  await createAuditLog(supabase, {
+    actorId:    user.id,
+    action:     'delete_comment',
+    targetType: 'comment',
+    targetId:   commentId,
+  })
 
   revalidatePath(`/c/${communitySlug}/${postId}`)
   redirect(`/c/${communitySlug}/${postId}`)

@@ -35,6 +35,9 @@ export default async function AdminReportsPage() {
           <Link href="/admin/communities" className="text-sm text-zinc-400 hover:text-white">
             Communities →
           </Link>
+          <Link href="/admin/audit-logs" className="text-sm text-zinc-400 hover:text-white">
+            Audit Log →
+          </Link>
         </div>
       </div>
 

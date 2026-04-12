@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { createAuditLog } from '@/lib/audit'
 
 export async function banFromCommunity(
   communityId: string,
@@ -37,6 +38,14 @@ export async function banFromCommunity(
 
   if (error && !error.message.includes('duplicate')) return { error: error.message }
 
+  await createAuditLog(supabase, {
+    actorId:     user.id,
+    action:      'community_ban',
+    targetType:  'user',
+    targetId:    userId,
+    communityId,
+  })
+
   revalidatePath(`/c/${communitySlug}`)
   return null
 }
@@ -69,6 +78,14 @@ export async function unbanFromCommunity(
 
   if (error) return { error: error.message }
 
+  await createAuditLog(supabase, {
+    actorId:     user.id,
+    action:      'community_unban',
+    targetType:  'user',
+    targetId:    userId,
+    communityId,
+  })
+
   revalidatePath(`/c/${communitySlug}`)
   return null
 }
@@ -92,6 +109,14 @@ export async function banFromPlatform(userId: string): Promise<{ error: string }
     .eq('id', userId)
 
   if (error) return { error: error.message }
+
+  await createAuditLog(supabase, {
+    actorId:    user.id,
+    action:     'ban_user',
+    targetType: 'user',
+    targetId:   userId,
+  })
+
   return null
 }
 
@@ -114,5 +139,101 @@ export async function unbanFromPlatform(userId: string): Promise<{ error: string
     .eq('id', userId)
 
   if (error) return { error: error.message }
+
+  await createAuditLog(supabase, {
+    actorId:    user.id,
+    action:     'unban_user',
+    targetType: 'user',
+    targetId:   userId,
+  })
+
+  return null
+}
+
+export async function assignModerator(
+  communityId: string,
+  userId: string,
+  communitySlug: string
+): Promise<{ error: string } | null> {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+
+  // Only the community admin (not platform admin) can assign mods
+  const { data: callerMembership } = await supabase
+    .from('memberships')
+    .select('role')
+    .eq('community_id', communityId)
+    .eq('user_id', user.id)
+    .single()
+
+  if (callerMembership?.role !== 'admin') return { error: 'Unauthorized' }
+
+  // Target must be a current member
+  const { data: targetMembership } = await supabase
+    .from('memberships')
+    .select('role')
+    .eq('community_id', communityId)
+    .eq('user_id', userId)
+    .single()
+
+  if (!targetMembership) return { error: 'User is not a member of this community' }
+  if (targetMembership.role === 'admin') return { error: 'Cannot change role of community admin' }
+
+  const { error } = await supabase
+    .from('memberships')
+    .update({ role: 'moderator' })
+    .eq('community_id', communityId)
+    .eq('user_id', userId)
+
+  if (error) return { error: error.message }
+
+  await createAuditLog(supabase, {
+    actorId:     user.id,
+    action:      'assign_mod',
+    targetType:  'user',
+    targetId:    userId,
+    communityId,
+  })
+
+  revalidatePath(`/c/${communitySlug}/settings`)
+  return null
+}
+
+export async function removeModerator(
+  communityId: string,
+  userId: string,
+  communitySlug: string
+): Promise<{ error: string } | null> {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+
+  const { data: callerMembership } = await supabase
+    .from('memberships')
+    .select('role')
+    .eq('community_id', communityId)
+    .eq('user_id', user.id)
+    .single()
+
+  if (callerMembership?.role !== 'admin') return { error: 'Unauthorized' }
+
+  const { error } = await supabase
+    .from('memberships')
+    .update({ role: 'member' })
+    .eq('community_id', communityId)
+    .eq('user_id', userId)
+
+  if (error) return { error: error.message }
+
+  await createAuditLog(supabase, {
+    actorId:     user.id,
+    action:      'remove_mod',
+    targetType:  'user',
+    targetId:    userId,
+    communityId,
+  })
+
+  revalidatePath(`/c/${communitySlug}/settings`)
   return null
 }

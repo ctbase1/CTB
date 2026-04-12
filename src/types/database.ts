@@ -438,6 +438,54 @@ export type Database = {
           },
         ]
       }
+      audit_logs: {
+        Row: {
+          id:           string
+          actor_id:     string | null
+          action:       string
+          target_type:  string
+          target_id:    string | null
+          community_id: string | null
+          metadata:     Record<string, unknown>
+          created_at:   string
+        }
+        Insert: {
+          id?:          string
+          actor_id?:    string | null
+          action:       string
+          target_type:  string
+          target_id?:   string | null
+          community_id?: string | null
+          metadata?:    Record<string, unknown>
+          created_at?:  string
+        }
+        Update: {
+          id?:          string
+          actor_id?:    string | null
+          action?:      string
+          target_type?: string
+          target_id?:   string | null
+          community_id?: string | null
+          metadata?:    Record<string, unknown>
+          created_at?:  string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_logs_community_id_fkey"
+            columns: ["community_id"]
+            isOneToOne: false
+            referencedRelation: "communities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           author_id: string

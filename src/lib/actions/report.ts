@@ -1,6 +1,8 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { sanitizeText } from '@/lib/sanitize'
+import { createAuditLog } from '@/lib/audit'
 
 export async function createReport(
   targetId: string,
@@ -11,9 +13,12 @@ export async function createReport(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'You must be logged in to report' }
 
-  const trimmed = reason.trim()
-  if (!trimmed) return { error: 'Reason is required' }
-  if (trimmed.length > 500) return { error: 'Reason must be under 500 characters' }
+  let trimmed: string
+  try {
+    trimmed = sanitizeText(reason, { min: 1, max: 500 })
+  } catch (e) {
+    return { error: (e as Error).message }
+  }
 
   const { error } = await supabase
     .from('reports')
@@ -42,5 +47,13 @@ export async function resolveReport(reportId: string): Promise<{ error: string }
     .eq('id', reportId)
 
   if (error) return { error: error.message }
+
+  await createAuditLog(supabase, {
+    actorId:    user.id,
+    action:     'resolve_report',
+    targetType: 'report',
+    targetId:   reportId,
+  })
+
   return null
 }
