@@ -13,12 +13,21 @@ export async function joinCommunity(formData: FormData) {
   const communitySlug = formData.get('communitySlug') as string | null
   if (!communityId || !communitySlug) redirect('/')
 
+  const { data: ban } = await supabase
+    .from('community_bans')
+    .select('user_id')
+    .eq('community_id', communityId)
+    .eq('user_id', user.id)
+    .single()
+
+  if (ban) redirect(`/c/${communitySlug}?error=banned`)
+
   await supabase.from('memberships').insert({
     user_id: user.id,
     community_id: communityId,
     role: 'member',
   })
-  // Silently ignore error (already a member, or banned — Phase 5 adds ban enforcement)
+  // Silently ignore duplicate membership error
 
   revalidatePath(`/c/${communitySlug}`)
   revalidatePath('/')

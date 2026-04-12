@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { LikeButton } from '@/components/like-button'
 import { CommentForm } from '@/components/comment-form'
 import { CommentThread } from '@/components/comment-thread'
+import { ReportButton } from '@/components/report-button'
+import { BanFromCommunityButton } from '@/components/ban-from-community-button'
 import { deletePost } from '@/lib/actions/post'
 import type { Membership } from '@/types/database'
 import type { CommentData } from '@/components/comment-item'
@@ -71,12 +73,11 @@ export default async function PostPage({ params }: Props) {
     userLikedPost = !!likeResult.data
   }
 
-  const isMember    = !!membership
-  const canDeletePost =
-    !!user &&
-    (user.id === post.author_id ||
-      membership?.role === 'admin' ||
-      membership?.role === 'moderator')
+  const isMember      = !!membership
+  const canMod        = membership?.role === 'admin' || membership?.role === 'moderator'
+  const isPostAuthor  = !!user && user.id === post.author_id
+  const canDeletePost = isPostAuthor || canMod
+  const canBanAuthor  = canMod && !isPostAuthor && !!post.author_id
 
   // Fetch comments with authors
   const { data: rawComments } = await supabase
@@ -90,8 +91,8 @@ export default async function PostPage({ params }: Props) {
   const commentIds = rawCommentList.map(c => c.id)
 
   // Comment like counts + user liked state
-  const commentLikeCountMap  = new Map<string, number>()
-  const userLikedCommentIds  = new Set<string>()
+  const commentLikeCountMap = new Map<string, number>()
+  const userLikedCommentIds = new Set<string>()
 
   if (commentIds.length > 0) {
     const { data: commentLikeRows } = await supabase
@@ -144,21 +145,34 @@ export default async function PostPage({ params }: Props) {
       <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
         <div className="mb-1 flex items-start justify-between gap-4">
           <h1 className="text-xl font-bold leading-tight text-white">{post.title}</h1>
-          {canDeletePost && (
-            <form action={deletePost}>
-              <input type="hidden" name="post_id"        value={post.id} />
-              <input type="hidden" name="community_slug" value={community.slug} />
-              <button
-                type="submit"
-                onClick={(e) => {
-                  if (!confirm('Delete this post?')) e.preventDefault()
-                }}
-                className="shrink-0 text-xs text-zinc-600 hover:text-red-400"
-              >
-                Delete
-              </button>
-            </form>
-          )}
+          <div className="flex shrink-0 items-center gap-3">
+            {user && !isPostAuthor && (
+              <ReportButton targetId={post.id} targetType="post" />
+            )}
+            {canBanAuthor && (
+              <BanFromCommunityButton
+                communityId={community.id}
+                communitySlug={community.slug}
+                userId={post.author_id}
+                username={postAuthor?.username ?? 'user'}
+              />
+            )}
+            {canDeletePost && (
+              <form action={deletePost}>
+                <input type="hidden" name="post_id"        value={post.id} />
+                <input type="hidden" name="community_slug" value={community.slug} />
+                <button
+                  type="submit"
+                  onClick={(e) => {
+                    if (!confirm('Delete this post?')) e.preventDefault()
+                  }}
+                  className="text-xs text-zinc-600 hover:text-red-400"
+                >
+                  Delete
+                </button>
+              </form>
+            )}
+          </div>
         </div>
 
         <p className="mb-4 text-xs text-zinc-500">
@@ -208,8 +222,10 @@ export default async function PostPage({ params }: Props) {
         <CommentThread
           comments={enrichedComments}
           postId={post.id}
+          communityId={community.id}
           communitySlug={community.slug}
           userId={user?.id ?? null}
+          canMod={canMod}
         />
       </div>
     </div>

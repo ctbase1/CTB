@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { LikeButton } from './like-button'
 import { CommentForm } from './comment-form'
+import { ReportButton } from './report-button'
+import { BanFromCommunityButton } from './ban-from-community-button'
 import { deleteComment } from '@/lib/actions/comment'
 
 export interface CommentData {
@@ -20,20 +22,26 @@ interface Props {
   comment: CommentData
   replies: CommentData[]
   postId: string
+  communityId: string
   communitySlug: string
   userId: string | null
+  canMod: boolean
 }
 
 export function CommentItem({
   comment,
   replies,
   postId,
+  communityId,
   communitySlug,
   userId,
+  canMod,
 }: Props) {
   const [showReplyForm, setShowReplyForm] = useState(false)
-  const isTopLevel = !comment.parent_id
-  const canDelete  = !!userId && userId === comment.author_id
+  const isTopLevel  = !comment.parent_id
+  const isOwnComment = !!userId && userId === comment.author_id
+  const canDelete   = isOwnComment || canMod
+  const canBan      = canMod && !isOwnComment
 
   return (
     <div>
@@ -47,22 +55,35 @@ export function CommentItem({
               {new Date(comment.created_at).toLocaleDateString()}
             </span>
           </div>
-          {canDelete && (
-            <form action={deleteComment}>
-              <input type="hidden" name="comment_id"     value={comment.id} />
-              <input type="hidden" name="post_id"        value={postId} />
-              <input type="hidden" name="community_slug" value={communitySlug} />
-              <button
-                type="submit"
-                onClick={(e) => {
-                  if (!confirm('Delete this comment?')) e.preventDefault()
-                }}
-                className="text-xs text-zinc-600 hover:text-red-400"
-              >
-                Delete
-              </button>
-            </form>
-          )}
+          <div className="flex items-center gap-3">
+            {userId && !isOwnComment && (
+              <ReportButton targetId={comment.id} targetType="comment" />
+            )}
+            {canBan && comment.author_id && (
+              <BanFromCommunityButton
+                communityId={communityId}
+                communitySlug={communitySlug}
+                userId={comment.author_id}
+                username={comment.author?.username ?? 'user'}
+              />
+            )}
+            {canDelete && (
+              <form action={deleteComment}>
+                <input type="hidden" name="comment_id"     value={comment.id} />
+                <input type="hidden" name="post_id"        value={postId} />
+                <input type="hidden" name="community_slug" value={communitySlug} />
+                <button
+                  type="submit"
+                  onClick={(e) => {
+                    if (!confirm('Delete this comment?')) e.preventDefault()
+                  }}
+                  className="text-xs text-zinc-600 hover:text-red-400"
+                >
+                  Delete
+                </button>
+              </form>
+            )}
+          </div>
         </div>
 
         <p className="whitespace-pre-wrap text-sm text-zinc-300">{comment.body}</p>
@@ -105,8 +126,10 @@ export function CommentItem({
               comment={reply}
               replies={[]}
               postId={postId}
+              communityId={communityId}
               communitySlug={communitySlug}
               userId={userId}
+              canMod={canMod}
             />
           ))}
         </div>

@@ -3,11 +3,13 @@ import { CommentItem, type CommentData } from './comment-item'
 interface Props {
   comments: CommentData[]
   postId: string
+  communityId: string
   communitySlug: string
   userId: string | null
+  canMod: boolean
 }
 
-export function CommentThread({ comments, postId, communitySlug, userId }: Props) {
+export function CommentThread({ comments, postId, communityId, communitySlug, userId, canMod }: Props) {
   const topLevel = comments.filter(c => !c.parent_id)
 
   const repliesMap = new Map<string, CommentData[]>()
@@ -35,8 +37,10 @@ export function CommentThread({ comments, postId, communitySlug, userId }: Props
           comment={comment}
           replies={repliesMap.get(comment.id) ?? []}
           postId={postId}
+          communityId={communityId}
           communitySlug={communitySlug}
           userId={userId}
+          canMod={canMod}
         />
       ))}
     </div>
