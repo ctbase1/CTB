@@ -1,9 +1,9 @@
 export async function uploadToCloudinary(file: File): Promise<string> {
-  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
-  const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME?.trim()
+  const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET?.trim()
 
   if (!cloudName || !uploadPreset) {
-    throw new Error('Cloudinary env vars not set')
+    throw new Error(`Cloudinary env vars not set (cloud="${cloudName}" preset="${uploadPreset}")`)
   }
 
   const MAX_BYTES = 5 * 1024 * 1024 // 5 MB
@@ -23,7 +23,8 @@ export async function uploadToCloudinary(file: File): Promise<string> {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
-    throw new Error(err?.error?.message ?? `Cloudinary upload failed (${res.status})`)
+    const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`
+    throw new Error(`${err?.error?.message ?? 'Upload failed'} (status=${res.status} cloud="${cloudName}" preset="${uploadPreset}" url=${url})`)
   }
 
   const data = await res.json()
