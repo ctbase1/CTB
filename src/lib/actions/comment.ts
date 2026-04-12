@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { createNotification } from '@/lib/notifications'
 
 export async function createComment(
   formData: FormData
@@ -16,13 +17,13 @@ export async function createComment(
   const body          = ((formData.get('body') as string) ?? '').trim()
   const communitySlug = formData.get('community_slug') as string
 
-  if (!body)           return { error: 'Comment cannot be empty' }
+  if (!body)              return { error: 'Comment cannot be empty' }
   if (body.length > 2000) return { error: 'Comment must be under 2000 characters' }
-  if (!postId)         return { error: 'Invalid post' }
+  if (!postId)            return { error: 'Invalid post' }
 
   const { data: post } = await supabase
     .from('posts')
-    .select('community_id')
+    .select('community_id, author_id')
     .eq('id', postId)
     .eq('is_removed', false)
     .single()
@@ -44,7 +45,34 @@ export async function createComment(
 
   if (error) return { error: error.message }
 
-  revalidatePath(`/c/${communitySlug}/${postId}`)
+  const targetUrl = `/c/${communitySlug}/${postId}`
+
+  if (parentId) {
+    // Reply — notify the parent comment author
+    const { data: parentComment } = await supabase
+      .from('comments')
+      .select('author_id')
+      .eq('id', parentId)
+      .single()
+    if (parentComment) {
+      await createNotification(supabase, {
+        userId:    parentComment.author_id,
+        actorId:   user.id,
+        type:      'reply',
+        targetUrl,
+      })
+    }
+  } else {
+    // Top-level comment — notify the post author
+    await createNotification(supabase, {
+      userId:    post.author_id,
+      actorId:   user.id,
+      type:      'comment',
+      targetUrl,
+    })
+  }
+
+  revalidatePath(targetUrl)
   return null
 }
 

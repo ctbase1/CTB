@@ -123,6 +123,51 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          actor_id: string
+          created_at: string
+          id: string
+          read_at: string | null
+          target_url: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          actor_id: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          target_url: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          actor_id?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          target_url?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       follows: {
         Row: {
           created_at: string
@@ -555,3 +600,4 @@ export type Like = Database['public']['Tables']['likes']['Row']
 export type Follow = Database['public']['Tables']['follows']['Row']
 export type Report = Database['public']['Tables']['reports']['Row']
 export type CommunityBan = Database['public']['Tables']['community_bans']['Row']
+export type Notification = Database['public']['Tables']['notifications']['Row']

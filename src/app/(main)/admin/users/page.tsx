@@ -34,7 +34,7 @@ export default async function AdminUsersPage() {
 
       <div className="space-y-2">
         {allUsers.map(u => (
-          <div key={u.id} className="flex items-center justify-between gap-4 rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3">
+          <div key={u.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3">
             <div className="flex items-center gap-3">
               <Link href={`/u/${u.username}`} className="text-sm font-medium text-white hover:underline">
                 {u.username}
