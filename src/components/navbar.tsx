@@ -30,6 +30,9 @@ export function Navbar({ profile }: NavbarProps) {
           <Link href="/notifications" className="text-sm text-zinc-400 hover:text-white">
             Notifications
           </Link>
+          <Link href="/c/new" className="text-sm text-zinc-400 hover:text-white">
+            + Create
+          </Link>
           <Link href={`/u/${profile.username}`} className="text-sm text-zinc-400 hover:text-white">
             {profile.username}
           </Link>
