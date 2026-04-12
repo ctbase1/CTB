@@ -42,6 +42,7 @@ export default async function CommunityPage({ params, searchParams }: Props) {
   }
 
   const isAdmin = membership?.role === 'admin'
+  const count = memberCount ?? 0
 
   return (
     <div>
@@ -57,7 +58,7 @@ export default async function CommunityPage({ params, searchParams }: Props) {
         <div>
           <h1 className="text-2xl font-bold text-white">{community.name}</h1>
           <p className="text-sm text-zinc-400 mt-0.5">
-            c/{community.slug} · {memberCount ?? 0} {memberCount === 1 ? 'member' : 'members'}
+            c/{community.slug} · {count} {count === 1 ? 'member' : 'members'}
           </p>
           {community.description && (
             <p className="mt-3 text-sm text-zinc-300 max-w-lg">{community.description}</p>
