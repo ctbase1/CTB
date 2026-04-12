@@ -192,6 +192,11 @@ export async function editPost(formData: FormData) {
   redirect(`/c/${communitySlug}/${postId}`)
 }
 
+export async function incrementViewCount(postId: string) {
+  const supabase = createClient()
+  await supabase.rpc('increment_post_view', { post_id: postId })
+}
+
 export async function togglePin(formData: FormData) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()

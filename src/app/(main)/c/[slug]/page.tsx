@@ -48,7 +48,7 @@ export default async function CommunityPage({ params, searchParams }: Props) {
   // Fetch posts with author — pinned first, then by created_at desc
   const { data: rawPosts } = await supabase
     .from('posts')
-    .select('*, author:profiles!author_id(username)')
+    .select('*, view_count, author:profiles!author_id(username)')
     .eq('community_id', community.id)
     .eq('is_removed', false)
     .order('is_pinned', { ascending: false })
@@ -83,15 +83,25 @@ export default async function CommunityPage({ params, searchParams }: Props) {
     }
   }
 
-  // Saved post IDs for current user
-  const savedPostIds = new Set<string>()
+  // Saved post IDs + liked post IDs for current user
+  const savedPostIds  = new Set<string>()
+  const likedPostIds  = new Set<string>()
   if (user && postIds.length > 0) {
-    const { data: savedRows } = await supabase
-      .from('saved_posts')
-      .select('post_id')
-      .eq('user_id', user.id)
-      .in('post_id', postIds)
+    const [{ data: savedRows }, { data: likedRows }] = await Promise.all([
+      supabase
+        .from('saved_posts')
+        .select('post_id')
+        .eq('user_id', user.id)
+        .in('post_id', postIds),
+      supabase
+        .from('likes')
+        .select('target_id')
+        .eq('user_id', user.id)
+        .eq('target_type', 'post')
+        .in('target_id', postIds),
+    ])
     for (const { post_id } of savedRows ?? []) savedPostIds.add(post_id)
+    for (const { target_id } of likedRows ?? []) likedPostIds.add(target_id)
   }
 
   const isAdmin = membership?.role === 'admin'
@@ -198,6 +208,7 @@ export default async function CommunityPage({ params, searchParams }: Props) {
                   commentCount={commentCountMap.get(p.id) ?? 0}
                   communitySlug={community.slug}
                   isSaved={savedPostIds.has(p.id)}
+                  initialLiked={likedPostIds.has(p.id)}
                   userId={user?.id ?? null}
                 />
               ))}

@@ -49,14 +49,16 @@ export default async function HomePage({ searchParams }: Props) {
     flair?: string | null
     is_pinned?: boolean
     link_preview?: { title: string | null; description: string | null; image_url: string | null; url: string } | null
+    view_count: number
     author: { username: string } | null
     community: { name: string; slug: string } | null
   }
 
   let posts: FeedPost[] = []
-  const likeCountMap = new Map<string, number>()
+  const likeCountMap  = new Map<string, number>()
   const commentCountMap = new Map<string, number>()
-  const savedPostIds = new Set<string>()
+  const savedPostIds  = new Set<string>()
+  const likedPostIds  = new Set<string>()
 
   type CommunityRow = { id: string; name: string; slug: string; description: string | null; banner_url: string | null; created_by: string; is_removed: boolean; created_at: string; allowed_flairs: string[]; rules: { title: string; body: string }[] }
   let allCommunities: CommunityRow[] = []
@@ -66,7 +68,7 @@ export default async function HomePage({ searchParams }: Props) {
     if (myIds.length > 0) {
       const { data: rawPosts } = await supabase
         .from('posts')
-        .select('*, author:profiles!author_id(username), community:communities!community_id(name,slug)')
+        .select('*, view_count, author:profiles!author_id(username), community:communities!community_id(name,slug)')
         .in('community_id', myIds)
         .eq('is_removed', false)
         .order('created_at', { ascending: false })
@@ -77,7 +79,7 @@ export default async function HomePage({ searchParams }: Props) {
   } else if (tab === 'all') {
     const { data: rawPosts } = await supabase
       .from('posts')
-      .select('*, author:profiles!author_id(username), community:communities!community_id(name,slug)')
+      .select('*, view_count, author:profiles!author_id(username), community:communities!community_id(name,slug)')
       .eq('is_removed', false)
       .order('created_at', { ascending: false })
       .limit(20)
@@ -104,28 +106,31 @@ export default async function HomePage({ searchParams }: Props) {
     }
   }
 
-  // Bulk like + comment counts + saved state for post tabs
+  // Bulk like + comment counts + saved + user-liked state for post tabs
   if (posts.length > 0) {
     const postIds = posts.map(p => p.id)
-    const [likeResult, commentResult, savedResult] = await Promise.all([
+    const [likeResult, commentResult, savedResult, userLikedResult] = await Promise.all([
       supabase.from('likes').select('target_id').eq('target_type', 'post').in('target_id', postIds),
       supabase.from('comments').select('post_id').eq('is_removed', false).in('post_id', postIds),
       user
         ? supabase.from('saved_posts').select('post_id').eq('user_id', user.id).in('post_id', postIds)
         : Promise.resolve({ data: null }),
+      user
+        ? supabase.from('likes').select('target_id').eq('user_id', user.id).eq('target_type', 'post').in('target_id', postIds)
+        : Promise.resolve({ data: null }),
     ])
-    const likeRows    = likeResult.data
-    const commentRows = commentResult.data
-    const savedRows   = savedResult.data
 
-    for (const { target_id } of likeRows ?? []) {
+    for (const { target_id } of likeResult.data ?? []) {
       likeCountMap.set(target_id, (likeCountMap.get(target_id) ?? 0) + 1)
     }
-    for (const { post_id } of commentRows ?? []) {
+    for (const { post_id } of commentResult.data ?? []) {
       commentCountMap.set(post_id, (commentCountMap.get(post_id) ?? 0) + 1)
     }
-    for (const { post_id } of savedRows ?? []) {
+    for (const { post_id } of savedResult.data ?? []) {
       savedPostIds.add(post_id)
+    }
+    for (const { target_id } of userLikedResult.data ?? []) {
+      likedPostIds.add(target_id)
     }
   }
 
@@ -178,6 +183,7 @@ export default async function HomePage({ searchParams }: Props) {
                 commentCount={commentCountMap.get(p.id) ?? 0}
                 communitySlug={p.community?.slug ?? ''}
                 isSaved={savedPostIds.has(p.id)}
+                initialLiked={likedPostIds.has(p.id)}
                 userId={user?.id ?? null}
               />
             ))
@@ -201,6 +207,7 @@ export default async function HomePage({ searchParams }: Props) {
                 commentCount={commentCountMap.get(p.id) ?? 0}
                 communitySlug={p.community?.slug ?? ''}
                 isSaved={savedPostIds.has(p.id)}
+                initialLiked={likedPostIds.has(p.id)}
                 userId={user?.id ?? null}
               />
             ))

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { BookmarkButton } from '@/components/bookmark-button'
-import { Heart, MessageSquare, Pin } from 'lucide-react'
+import { Pin } from 'lucide-react'
+import { PostActionBar } from '@/components/post-action-bar'
 
 interface LinkPreview {
   title: string | null
@@ -20,6 +20,7 @@ interface PostForCard {
   flair?: string | null
   is_pinned?: boolean
   link_preview?: LinkPreview | null
+  view_count: number
   author: { username: string } | null
 }
 
@@ -29,22 +30,17 @@ interface Props {
   commentCount: number
   communitySlug: string
   isSaved?: boolean
+  initialLiked?: boolean
   userId?: string | null
 }
 
-export function PostCard({ post, likeCount, commentCount, communitySlug, isSaved, userId }: Props) {
+export function PostCard({ post, likeCount, commentCount, communitySlug, isSaved, initialLiked, userId }: Props) {
   return (
     <div className="group relative rounded-2xl border border-slate-700/50 bg-slate-900 transition-all hover:border-violet-500/30 hover:shadow-glow-violet">
       {post.is_pinned && (
         <div className="flex items-center gap-1.5 border-b border-slate-700/50 px-4 pt-2.5 pb-2 text-xs font-medium text-violet-300">
           <Pin className="h-3 w-3" />
           <span>Pinned</span>
-        </div>
-      )}
-
-      {userId && (
-        <div className="absolute right-3 top-3 z-10">
-          <BookmarkButton postId={post.id} isSaved={!!isSaved} />
         </div>
       )}
 
@@ -57,7 +53,7 @@ export function PostCard({ post, likeCount, commentCount, communitySlug, isSaved
             <Image src={post.image_url} alt={post.title} fill className="object-cover" />
           </div>
         )}
-        <div className="min-w-0 flex-1 pr-6">
+        <div className="min-w-0 flex-1">
           {post.flair && (
             <span className="mb-1.5 inline-block rounded-full border border-violet-800/40 bg-slate-800 px-2.5 py-0.5 text-[11px] font-medium text-violet-400">
               {post.flair}
@@ -94,19 +90,20 @@ export function PostCard({ post, likeCount, commentCount, communitySlug, isSaved
               </div>
             </div>
           )}
-
-          <div className="mt-3 flex items-center gap-4 text-xs text-slate-500">
-            <span className="flex items-center gap-1">
-              <Heart className="h-3.5 w-3.5" />
-              {likeCount}
-            </span>
-            <span className="flex items-center gap-1">
-              <MessageSquare className="h-3.5 w-3.5" />
-              {commentCount}
-            </span>
-          </div>
         </div>
       </Link>
+
+      <div className="px-5 pb-4">
+        <PostActionBar
+          post={post}
+          likeCount={likeCount}
+          commentCount={commentCount}
+          initialLiked={initialLiked ?? false}
+          userId={userId}
+          isSaved={isSaved ?? false}
+          communitySlug={communitySlug}
+        />
+      </div>
     </div>
   )
 }

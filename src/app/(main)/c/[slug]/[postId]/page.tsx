@@ -9,7 +9,7 @@ import { ReportButton } from '@/components/report-button'
 import { BanFromCommunityButton } from '@/components/ban-from-community-button'
 import { DeletePostButton } from '@/components/delete-post-button'
 import { EditPostForm } from '@/components/edit-post-form'
-import { togglePin } from '@/lib/actions/post'
+import { togglePin, incrementViewCount } from '@/lib/actions/post'
 import type { Membership } from '@/types/database'
 import type { CommentData } from '@/components/comment-item'
 
@@ -41,6 +41,9 @@ export default async function PostPage({ params }: Props) {
     .single()
 
   if (!post) notFound()
+
+  // Fire-and-forget view count increment
+  void incrementViewCount(params.postId)
 
   const postAuthor = post.author as { username: string; avatar_url: string | null } | null
 

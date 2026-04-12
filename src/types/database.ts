@@ -500,6 +500,7 @@ export type Database = {
           is_removed: boolean
           link_preview: { title: string | null; description: string | null; image_url: string | null; url: string } | null
           title: string
+          view_count: number
         }
         Insert: {
           author_id: string
@@ -514,6 +515,7 @@ export type Database = {
           is_removed?: boolean
           link_preview?: { title: string | null; description: string | null; image_url: string | null; url: string } | null
           title: string
+          view_count?: number
         }
         Update: {
           author_id?: string
@@ -528,6 +530,7 @@ export type Database = {
           is_removed?: boolean
           link_preview?: { title: string | null; description: string | null; image_url: string | null; url: string } | null
           title?: string
+          view_count?: number
         }
         Relationships: [
           {
@@ -551,7 +554,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_post_view: {
+        Args: { post_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       membership_role: "admin" | "moderator" | "member"
