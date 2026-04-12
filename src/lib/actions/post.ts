@@ -13,7 +13,7 @@ async function fetchLinkPreview(url: string) {
     // Validate URL before fetching to prevent SSRF
     sanitizeUrl(url)
     const res = await fetch(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CBTBot/1.0)' },
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CTBBot/1.0)' },
       signal: AbortSignal.timeout(4000),
     })
     if (!res.ok) return null

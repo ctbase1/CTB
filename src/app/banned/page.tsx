@@ -29,7 +29,7 @@ export default async function BannedPage() {
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-zinc-950 px-4 text-center">
       <h1 className="text-3xl font-bold text-red-400">Account Suspended</h1>
       <p className="max-w-md text-zinc-400">
-        Your account has been banned from CBT Community. If you believe this is a mistake,
+        Your account has been banned from CTB Community. If you believe this is a mistake,
         contact support.
       </p>
       <form action={signOut}>

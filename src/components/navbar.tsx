@@ -29,7 +29,7 @@ export function Navbar({ profile, unreadCount }: NavbarProps) {
 
         {/* Logo */}
         <Link href="/" className="shrink-0 text-lg font-bold tracking-tight text-violet-400 hover:text-violet-300 transition-colors">
-          CBT
+          CTB
         </Link>
 
         {/* Search — pill shaped */}
