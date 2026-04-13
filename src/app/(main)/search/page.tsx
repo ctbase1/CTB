@@ -21,8 +21,6 @@ export default async function SearchPage({ searchParams }: Props) {
     )
   }
 
-  const pattern = `%${q}%`
-
   const [
     { data: posts },
     { data: communities },
@@ -32,19 +30,19 @@ export default async function SearchPage({ searchParams }: Props) {
       .from('posts')
       .select('id, title, body, created_at, community_id, communities!community_id(slug), author:profiles!author_id(username)')
       .eq('is_removed', false)
-      .or(`title.ilike.${pattern},body.ilike.${pattern}`)
+      .textSearch('search_vector', q, { type: 'websearch', config: 'english' })
       .order('created_at', { ascending: false })
       .limit(10),
     supabase
       .from('communities')
       .select('id, name, slug, description, banner_url')
       .eq('is_removed', false)
-      .or(`name.ilike.${pattern},slug.ilike.${pattern},description.ilike.${pattern}`)
+      .textSearch('search_vector', q, { type: 'websearch', config: 'english' })
       .limit(8),
     supabase
       .from('profiles')
       .select('id, username, avatar_url, bio')
-      .ilike('username', pattern)
+      .ilike('username', `%${q}%`)
       .limit(8),
   ])
 
@@ -148,8 +146,9 @@ export default async function SearchPage({ searchParams }: Props) {
       )}
 
       {totalResults === 0 && (
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 py-16 text-center">
-          <p className="text-sm text-zinc-500">No results found for &ldquo;{q}&rdquo;</p>
+        <div className="rounded-xl border border-slate-700/50 bg-slate-900 py-16 text-center">
+          <p className="text-sm font-medium text-slate-400">No results for &ldquo;{q}&rdquo;</p>
+          <p className="mt-1 text-xs text-slate-600">Try different keywords or check your spelling.</p>
         </div>
       )}
     </div>
