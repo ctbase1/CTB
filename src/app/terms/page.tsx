@@ -20,7 +20,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="mb-3 text-base font-semibold text-white">1. Acceptance of Terms</h2>
-            <p>By accessing or using CTB ("the Platform"), you agree to be bound by these Terms & Conditions. If you do not agree, do not use the Platform.</p>
+            <p>By accessing or using CTB (&ldquo;the Platform&rdquo;), you agree to be bound by these Terms &amp; Conditions. If you do not agree, do not use the Platform.</p>
           </section>
 
           <section>

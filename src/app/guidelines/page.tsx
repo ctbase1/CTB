@@ -20,7 +20,7 @@ export default function GuidelinesPage() {
 
           <section>
             <h2 className="mb-3 text-base font-semibold text-white">2. Label Opinion as Opinion</h2>
-            <p>When you post about a token or trade, make it clear you are sharing your personal view, not financial advice. Use phrases like "in my opinion", "I think", or "NFA" (not financial advice). Do not present speculation as fact.</p>
+            <p>When you post about a token or trade, make it clear you are sharing your personal view, not financial advice. Use phrases like &ldquo;in my opinion&rdquo;, &ldquo;I think&rdquo;, or &ldquo;NFA&rdquo; (not financial advice). Do not present speculation as fact.</p>
           </section>
 
           <section>
