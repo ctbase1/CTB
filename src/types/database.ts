@@ -91,18 +91,21 @@ export type Database = {
           banned_by: string
           community_id: string
           created_at: string
+          expires_at: string | null
           user_id: string
         }
         Insert: {
           banned_by: string
           community_id: string
           created_at?: string
+          expires_at?: string | null
           user_id: string
         }
         Update: {
           banned_by?: string
           community_id?: string
           created_at?: string
+          expires_at?: string | null
           user_id?: string
         }
         Relationships: [
@@ -242,18 +245,21 @@ export type Database = {
           joined_at: string
           role: Database["public"]["Enums"]["membership_role"]
           user_id: string
+          flair: string | null
         }
         Insert: {
           community_id: string
           joined_at?: string
           role?: Database["public"]["Enums"]["membership_role"]
           user_id: string
+          flair?: string | null
         }
         Update: {
           community_id?: string
           joined_at?: string
           role?: Database["public"]["Enums"]["membership_role"]
           user_id?: string
+          flair?: string | null
         }
         Relationships: [
           {
@@ -391,6 +397,7 @@ export type Database = {
           author_id: string
           body: string
           created_at: string
+          edited_at: string | null
           id: string
           is_removed: boolean
           parent_id: string | null
@@ -400,6 +407,7 @@ export type Database = {
           author_id: string
           body: string
           created_at?: string
+          edited_at?: string | null
           id?: string
           is_removed?: boolean
           parent_id?: string | null
@@ -409,6 +417,7 @@ export type Database = {
           author_id?: string
           body?: string
           created_at?: string
+          edited_at?: string | null
           id?: string
           is_removed?: boolean
           parent_id?: string | null
