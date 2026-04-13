@@ -53,8 +53,8 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
   // Public routes that never need auth
-  const publicPaths = ['/login', '/register', '/banned', '/auth/callback', '/verify-email']
-  const isPublic = publicPaths.some((p) => pathname.startsWith(p))
+  const publicPaths = ['/', '/login', '/register', '/banned', '/auth/callback', '/verify-email', '/terms', '/privacy', '/guidelines']
+  const isPublic = publicPaths.some((p) => pathname === p || (p !== '/' && pathname.startsWith(p)))
 
   // Not logged in → redirect to login
   if (!user && !isPublic) {
@@ -71,10 +71,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Logged in but accessing auth pages → redirect home
+  // Logged in but accessing auth pages → redirect to feed
   if (user && (pathname.startsWith('/login') || pathname.startsWith('/register'))) {
     const url = request.nextUrl.clone()
-    url.pathname = '/'
+    url.pathname = '/feed'
     return NextResponse.redirect(url)
   }
 

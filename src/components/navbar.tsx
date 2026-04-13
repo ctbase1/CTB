@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Profile } from '@/types/database'
 import { Bell, Bookmark, Settings, LogOut, PlusCircle, Search, User, Menu, X, ShieldAlert } from 'lucide-react'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 interface NavbarProps {
   profile: Profile
@@ -28,7 +29,7 @@ export function Navbar({ profile, unreadCount }: NavbarProps) {
       <div className="mx-auto flex max-w-4xl items-center gap-4">
 
         {/* Logo */}
-        <Link href="/" className="shrink-0 text-lg font-bold tracking-tight text-violet-400 hover:text-violet-300 transition-colors">
+        <Link href="/feed" className="shrink-0 text-lg font-bold tracking-tight text-violet-400 hover:text-violet-300 transition-colors">
           CTB
         </Link>
 
@@ -89,6 +90,8 @@ export function Navbar({ profile, unreadCount }: NavbarProps) {
           >
             <Settings className="h-4 w-4" />
           </Link>
+
+          <ThemeToggle />
 
           <button
             onClick={handleSignOut}
@@ -162,6 +165,10 @@ export function Navbar({ profile, unreadCount }: NavbarProps) {
               Admin Panel
             </Link>
           )}
+          <div className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-300">
+            <ThemeToggle />
+            <span>Toggle theme</span>
+          </div>
           <button
             onClick={handleSignOut}
             className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-slate-400 hover:text-red-400 hover:bg-slate-800 transition-colors"

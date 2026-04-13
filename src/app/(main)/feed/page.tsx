@@ -14,7 +14,7 @@ const TABS = [
   { id: 'communities', label: 'Communities' },
 ]
 
-export default async function HomePage({ searchParams }: Props) {
+export default async function FeedPage({ searchParams }: Props) {
   const pageLimit = Math.min(Math.max(Number(searchParams.limit ?? 20), 20), 100)
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -143,7 +143,7 @@ export default async function HomePage({ searchParams }: Props) {
           {TABS.map(t => (
             <Link
               key={t.id}
-              href={`/?tab=${t.id}`}
+              href={`/feed?tab=${t.id}`}
               className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
                 tab === t.id
                   ? 'bg-violet-600 text-white shadow-glow-violet-sm'
@@ -167,7 +167,7 @@ export default async function HomePage({ searchParams }: Props) {
           {myIds.length === 0 ? (
             <div className="rounded-xl border border-slate-700/50 bg-slate-900 p-8 text-center">
               <p className="text-slate-400 mb-2">You haven&apos;t joined any communities yet.</p>
-              <Link href="/?tab=communities" className="text-sm text-violet-400 hover:underline">
+              <Link href="/feed?tab=communities" className="text-sm text-violet-400 hover:underline">
                 Browse communities →
               </Link>
             </div>
@@ -192,7 +192,7 @@ export default async function HomePage({ searchParams }: Props) {
               ))}
               {posts.length === pageLimit && (
                 <div className="pt-2 text-center">
-                  <Link href={`/?tab=feed&limit=${pageLimit + 20}`} className="text-sm text-violet-400 hover:underline">
+                  <Link href={`/feed?tab=feed&limit=${pageLimit + 20}`} className="text-sm text-violet-400 hover:underline">
                     Load more
                   </Link>
                 </div>
@@ -226,7 +226,7 @@ export default async function HomePage({ searchParams }: Props) {
               ))}
               {posts.length === pageLimit && (
                 <div className="pt-2 text-center">
-                  <Link href={`/?tab=all&limit=${pageLimit + 20}`} className="text-sm text-violet-400 hover:underline">
+                  <Link href={`/feed?tab=all&limit=${pageLimit + 20}`} className="text-sm text-violet-400 hover:underline">
                     Load more
                   </Link>
                 </div>

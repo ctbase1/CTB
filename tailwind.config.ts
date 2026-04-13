@@ -6,11 +6,17 @@ const config: Config = {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        surface: "var(--surface)",
+        "surface-raised": "var(--surface-raised)",
+        accent: "var(--accent)",
+        muted: "var(--muted)",
+        "muted-foreground": "var(--muted-foreground)",
       },
       boxShadow: {
         "glow-violet": "0 0 20px rgba(139, 92, 246, 0.15)",

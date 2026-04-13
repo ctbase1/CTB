@@ -5,6 +5,27 @@
 :root {
   --background: #0f0f17;
   --foreground: #e2e8f0;
+  --surface: #161622;
+  --surface-raised: #1e1e2e;
+  --border: rgba(148, 163, 184, 0.12);
+  --border-strong: rgba(148, 163, 184, 0.20);
+  --muted: #475569;
+  --muted-foreground: #94a3b8;
+  --accent: #8b5cf6;
+  --accent-hover: #7c3aed;
+}
+
+html.light {
+  --background: #fafafa;
+  --foreground: #0f0f17;
+  --surface: #ffffff;
+  --surface-raised: #f4f4f5;
+  --border: rgba(15, 15, 23, 0.10);
+  --border-strong: rgba(15, 15, 23, 0.18);
+  --muted: #71717a;
+  --muted-foreground: #52525b;
+  --accent: #7c3aed;
+  --accent-hover: #6d28d9;
 }
 
 body {
@@ -24,12 +45,18 @@ body {
       var(--background);
   }
 
+  html.light .bg-hero-glow {
+    background:
+      radial-gradient(ellipse at top, rgba(124, 58, 237, 0.04) 0%, transparent 60%),
+      var(--background);
+  }
+
   .skeleton {
     background: linear-gradient(
       90deg,
-      rgba(30, 30, 46, 0) 0%,
-      rgba(42, 42, 62, 0.8) 50%,
-      rgba(30, 30, 46, 0) 100%
+      transparent 0%,
+      var(--surface-raised) 50%,
+      transparent 100%
     );
     background-size: 200% 100%;
     animation: shimmer 2s linear infinite;
