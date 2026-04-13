@@ -131,3 +131,45 @@ export async function deleteComment(formData: FormData) {
   revalidatePath(`/c/${communitySlug}/${postId}`)
   redirect(`/c/${communitySlug}/${postId}`)
 }
+
+export async function updateComment(
+  commentId: string,
+  body: string,
+  communitySlug: string,
+  postId: string
+): Promise<{ error: string } | null> {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'You must be logged in' }
+
+  const { data: comment } = await supabase
+    .from('comments')
+    .select('author_id, created_at')
+    .eq('id', commentId)
+    .eq('is_removed', false)
+    .single()
+
+  if (!comment) return { error: 'Comment not found' }
+  if (comment.author_id !== user.id) return { error: 'Not your comment' }
+
+  const ageMs = Date.now() - new Date(comment.created_at).getTime()
+  if (ageMs > 15 * 60 * 1000) return { error: 'Edit window has closed (15 minutes)' }
+
+  let sanitized: string
+  try {
+    sanitized = sanitizeText(body, { min: 1, max: 2000 })
+  } catch (e) {
+    return { error: (e as Error).message }
+  }
+
+  const { error } = await supabase
+    .from('comments')
+    .update({ body: sanitized, edited_at: new Date().toISOString() })
+    .eq('id', commentId)
+    .eq('author_id', user.id)
+
+  if (error) return { error: error.message }
+
+  revalidatePath(`/c/${communitySlug}/${postId}`)
+  return null
+}
