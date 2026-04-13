@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { LikeButton } from './like-button'
 import { CommentForm } from './comment-form'
 import { ReportButton } from './report-button'
@@ -14,7 +14,7 @@ export interface CommentData {
   id: string
   body: string
   created_at: string
-  edited_at?: string | null   // add this
+  edited_at?: string | null
   author_id: string
   parent_id: string | null
   author: { username: string; avatar_url: string | null } | null
@@ -53,9 +53,17 @@ export function CommentItem({
   const canDelete    = isOwnComment || canMod
   const canBan       = canMod && !isOwnComment
 
-  // Edit window: 15 minutes from created_at
-  const ageMs    = Date.now() - new Date(comment.created_at).getTime()
-  const canEdit  = isOwnComment && ageMs < 15 * 60 * 1000
+  // Edit window: 15 minutes from created_at; auto-expires in UI
+  const ageMs = Date.now() - new Date(comment.created_at).getTime()
+  const [canEdit, setCanEdit] = useState(isOwnComment && ageMs < 15 * 60 * 1000)
+
+  useEffect(() => {
+    if (!isOwnComment) return
+    const remaining = 15 * 60 * 1000 - ageMs
+    if (remaining <= 0) return
+    const id = setTimeout(() => setCanEdit(false), remaining)
+    return () => clearTimeout(id)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleSave() {
     setSaving(true)
@@ -143,6 +151,7 @@ export function CommentItem({
               value={editBody}
               onChange={e => setEditBody(e.target.value)}
               rows={3}
+              autoFocus
               className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500/30 resize-none"
             />
             {editError && <p className="text-xs text-red-400">{editError}</p>}
@@ -155,7 +164,7 @@ export function CommentItem({
                 {saving ? 'Saving…' : 'Save'}
               </button>
               <button
-                onClick={() => { setEditing(false); setEditError(null) }}
+                onClick={() => { setEditing(false); setEditError(null); setEditBody(comment.body) }}
                 className="rounded-lg px-3 py-1 text-xs text-slate-400 hover:text-white transition-colors"
               >
                 Cancel
