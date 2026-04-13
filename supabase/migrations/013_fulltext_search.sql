@@ -17,7 +17,7 @@ $$ LANGUAGE plpgsql;
 
 DROP TRIGGER IF EXISTS posts_search_update ON posts;
 CREATE TRIGGER posts_search_update
-  BEFORE INSERT OR UPDATE ON posts
+  BEFORE INSERT OR UPDATE OF title, body ON posts
   FOR EACH ROW EXECUTE FUNCTION posts_search_vector_update();
 
 -- Backfill existing posts
@@ -44,7 +44,7 @@ $$ LANGUAGE plpgsql;
 
 DROP TRIGGER IF EXISTS communities_search_update ON communities;
 CREATE TRIGGER communities_search_update
-  BEFORE INSERT OR UPDATE ON communities
+  BEFORE INSERT OR UPDATE OF name, description ON communities
   FOR EACH ROW EXECUTE FUNCTION communities_search_vector_update();
 
 -- Backfill existing communities
