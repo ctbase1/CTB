@@ -8,9 +8,11 @@ ALTER TABLE comments
 ALTER TABLE community_bans
   ADD COLUMN IF NOT EXISTS expires_at timestamptz;
 
--- Members can update their own comments (body + edited_at) within RLS
--- The ownership check + 15-min window is enforced in the server action;
--- RLS only checks ownership so the action can't be bypassed.
+-- Replace the existing comments_update_own policy (which lacked WITH CHECK)
+-- with a stricter version that prevents author_id tampering.
+DROP POLICY IF EXISTS "comments_update_own" ON comments;
+DROP POLICY IF EXISTS "authors_update_own_comments" ON comments;
+
 CREATE POLICY "authors_update_own_comments"
   ON comments
   FOR UPDATE
