@@ -15,12 +15,15 @@ export async function joinCommunity(formData: FormData) {
 
   const { data: ban } = await supabase
     .from('community_bans')
-    .select('user_id')
+    .select('expires_at')
     .eq('community_id', communityId)
     .eq('user_id', user.id)
     .single()
 
-  if (ban) redirect(`/c/${communitySlug}?error=banned`)
+  // Block only if ban is permanent (expires_at is null) or not yet expired
+  if (ban && (ban.expires_at === null || new Date(ban.expires_at) > new Date())) {
+    redirect(`/c/${communitySlug}?error=banned`)
+  }
 
   await supabase.from('memberships').insert({
     user_id: user.id,

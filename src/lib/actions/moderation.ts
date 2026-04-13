@@ -7,7 +7,8 @@ import { createAuditLog } from '@/lib/audit'
 export async function banFromCommunity(
   communityId: string,
   userId: string,
-  communitySlug: string
+  communitySlug: string,
+  expiresAt: string | null = null   // null = permanent
 ): Promise<{ error: string } | null> {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -31,12 +32,18 @@ export async function banFromCommunity(
     .eq('community_id', communityId)
     .eq('user_id', userId)
 
-  // Insert ban
+  // Delete any existing ban first, then insert fresh (handles re-banning expired users)
+  await supabase
+    .from('community_bans')
+    .delete()
+    .eq('community_id', communityId)
+    .eq('user_id', userId)
+
   const { error } = await supabase
     .from('community_bans')
-    .insert({ community_id: communityId, user_id: userId, banned_by: user.id })
+    .insert({ community_id: communityId, user_id: userId, banned_by: user.id, expires_at: expiresAt })
 
-  if (error && !error.message.includes('duplicate')) return { error: error.message }
+  if (error) return { error: error.message }
 
   await createAuditLog(supabase, {
     actorId:     user.id,
@@ -44,6 +51,7 @@ export async function banFromCommunity(
     targetType:  'user',
     targetId:    userId,
     communityId,
+    metadata:    { expires_at: expiresAt },
   })
 
   revalidatePath(`/c/${communitySlug}`)
