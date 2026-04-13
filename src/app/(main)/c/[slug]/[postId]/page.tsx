@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import Image from 'next/image'
 import Link from 'next/link'
 import { LikeButton } from '@/components/like-button'
 import { CommentForm } from '@/components/comment-form'
@@ -10,6 +9,8 @@ import { BanFromCommunityButton } from '@/components/ban-from-community-button'
 import { DeletePostButton } from '@/components/delete-post-button'
 import { EditPostForm } from '@/components/edit-post-form'
 import { togglePin, incrementViewCount } from '@/lib/actions/post'
+import { ImageLightbox } from '@/components/ui/image-lightbox'
+import { MarkdownRenderer } from '@/components/markdown-renderer'
 import type { Membership } from '@/types/database'
 import type { CommentData } from '@/components/comment-item'
 
@@ -87,7 +88,7 @@ export default async function PostPage({ params }: Props) {
   // Fetch comments with authors
   const { data: rawComments } = await supabase
     .from('comments')
-    .select('*, author:profiles!author_id(username, avatar_url)')
+    .select('id, body, created_at, edited_at, author_id, parent_id, author:profiles!author_id(username, avatar_url)')
     .eq('post_id', post.id)
     .eq('is_removed', false)
     .order('created_at', { ascending: true })
@@ -124,15 +125,35 @@ export default async function PostPage({ params }: Props) {
     }
   }
 
+  // Fetch member flairs for all comment authors + post author in this community
+  const allAuthorIds = Array.from(new Set([
+    post.author_id,
+    ...rawCommentList.map(c => c.author_id).filter(Boolean),
+  ]))
+  const memberFlairMap = new Map<string, string>()
+  if (allAuthorIds.length > 0) {
+    const { data: flairRows } = await supabase
+      .from('memberships')
+      .select('user_id, flair')
+      .eq('community_id', community.id)
+      .in('user_id', allAuthorIds)
+      .not('flair', 'is', null)
+    for (const row of flairRows ?? []) {
+      if (row.flair) memberFlairMap.set(row.user_id, row.flair)
+    }
+  }
+
   const enrichedComments: CommentData[] = rawCommentList.map(c => ({
-    id:         c.id,
-    body:       c.body,
-    created_at: c.created_at,
-    author_id:  c.author_id,
-    parent_id:  c.parent_id,
-    author:     c.author as { username: string; avatar_url: string | null } | null,
-    likeCount:  commentLikeCountMap.get(c.id) ?? 0,
-    liked:      userLikedCommentIds.has(c.id),
+    id:          c.id,
+    body:        c.body,
+    created_at:  c.created_at,
+    edited_at:   c.edited_at ?? null,
+    author_id:   c.author_id,
+    parent_id:   c.parent_id,
+    author:      c.author as { username: string; avatar_url: string | null } | null,
+    likeCount:   commentLikeCountMap.get(c.id) ?? 0,
+    liked:       userLikedCommentIds.has(c.id),
+    authorFlair: memberFlairMap.get(c.author_id) ?? null,
   }))
 
   return (
@@ -190,26 +211,32 @@ export default async function PostPage({ params }: Props) {
           </div>
         </div>
 
-        <p className="mb-4 text-xs text-zinc-500">
-          by {postAuthor?.username ?? 'unknown'} ·{' '}
-          {new Date(post.created_at).toLocaleDateString()}
-          {post.edited_at && <span className="ml-1 italic">· edited</span>}
+        <p className="mb-4 flex flex-wrap items-center gap-1.5 text-xs text-zinc-500">
+          <span>by</span>
+          {postAuthor?.username ? (
+            <Link href={`/u/${postAuthor.username}`} className="font-medium text-zinc-400 hover:text-violet-400 transition-colors">
+              {postAuthor.username}
+            </Link>
+          ) : (
+            <span>unknown</span>
+          )}
+          {memberFlairMap.get(post.author_id) && (
+            <span className="rounded-full border border-violet-800/40 bg-zinc-800 px-1.5 py-0.5 text-[10px] font-medium text-violet-400">
+              {memberFlairMap.get(post.author_id)}
+            </span>
+          )}
+          <span>· {new Date(post.created_at).toLocaleDateString()}</span>
+          {post.edited_at && <span className="italic">· edited</span>}
         </p>
 
         {post.image_url && (
-          <div className="relative mb-4 w-full overflow-hidden rounded-lg bg-zinc-800"
-               style={{ aspectRatio: '16/9' }}>
-            <Image
-              src={post.image_url}
-              alt={post.title}
-              fill
-              className="object-contain"
-            />
-          </div>
+          <ImageLightbox src={post.image_url} alt={post.title} />
         )}
 
         {post.body && (
-          <p className="mb-4 whitespace-pre-wrap text-sm text-zinc-300">{post.body}</p>
+          <div className="mb-4">
+            <MarkdownRenderer>{post.body}</MarkdownRenderer>
+          </div>
         )}
 
         {isPostAuthor && (
