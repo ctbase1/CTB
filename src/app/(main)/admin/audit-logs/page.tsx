@@ -71,9 +71,11 @@ export default async function AuditLogsPage() {
                   </p>
                   <p className="text-xs text-zinc-500">
                     by{' '}
-                    <span className="font-medium text-zinc-300">
-                      {actor?.username ?? 'unknown'}
-                    </span>
+                    {actor?.username ? (
+                      <a href={`/u/${actor.username}`} className="font-medium text-zinc-300 hover:text-violet-400 transition-colors">{actor.username}</a>
+                    ) : (
+                      <span className="font-medium text-zinc-300">unknown</span>
+                    )}
                     {log.target_type && (
                       <>
                         {' · '}

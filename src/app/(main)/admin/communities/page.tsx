@@ -71,7 +71,12 @@ export default async function AdminCommunitiesPage() {
                   )}
                 </div>
                 <p className="text-xs text-zinc-500">
-                  by {creator?.username ?? 'unknown'} &middot; {countMap.get(c.id) ?? 0} members &middot; {new Date(c.created_at).toLocaleDateString()}
+                  by{' '}
+                  {creator?.username
+                    ? <a href={`/u/${creator.username}`} className="hover:text-violet-400 transition-colors">{creator.username}</a>
+                    : 'unknown'
+                  }
+                  {' '}&middot; {countMap.get(c.id) ?? 0} members &middot; {new Date(c.created_at).toLocaleDateString()}
                 </p>
               </div>
 

@@ -26,5 +26,12 @@ export async function signUp(formData: FormData) {
     redirect('/register?error=' + encodeURIComponent(error.message))
   }
 
-  redirect('/?welcome=1')
+  redirect('/register?verify=1&email=' + encodeURIComponent(email))
+}
+
+export async function resendConfirmation(formData: FormData) {
+  const email = formData.get('email') as string
+  const supabase = createClient()
+  await supabase.auth.resend({ type: 'signup', email })
+  redirect('/register?verify=1&email=' + encodeURIComponent(email) + '&resent=1')
 }

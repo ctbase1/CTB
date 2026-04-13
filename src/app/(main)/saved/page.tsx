@@ -53,9 +53,9 @@ export default async function SavedPage() {
       <h1 className="mb-6 text-xl font-bold text-white">Saved Posts</h1>
 
       {items.length === 0 ? (
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 py-16 text-center">
-          <p className="text-sm text-zinc-500">No saved posts yet.</p>
-          <p className="mt-1 text-xs text-zinc-600">Bookmark posts to find them here later.</p>
+        <div className="rounded-xl border border-slate-700/50 bg-slate-900 py-16 text-center">
+          <p className="text-sm font-medium text-slate-400">No saved posts yet</p>
+          <p className="mt-1 text-xs text-slate-600">Hit the bookmark icon on any post to save it here.</p>
         </div>
       ) : (
         <div className="space-y-2">

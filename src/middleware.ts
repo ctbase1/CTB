@@ -53,13 +53,21 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
   // Public routes that never need auth
-  const publicPaths = ['/login', '/register', '/banned', '/auth/callback']
+  const publicPaths = ['/login', '/register', '/banned', '/auth/callback', '/verify-email']
   const isPublic = publicPaths.some((p) => pathname.startsWith(p))
 
   // Not logged in → redirect to login
   if (!user && !isPublic) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
+
+  // Logged in but email not confirmed → redirect to verify-email
+  if (user && !user.email_confirmed_at && !pathname.startsWith('/verify-email') && !pathname.startsWith('/auth/callback')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/verify-email'
+    if (user.email) url.searchParams.set('email', user.email)
     return NextResponse.redirect(url)
   }
 

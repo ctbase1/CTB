@@ -5,6 +5,19 @@ import { useFormStatus } from 'react-dom'
 import Image from 'next/image'
 import { uploadToCloudinary } from '@/lib/cloudinary'
 import { createPost } from '@/lib/actions/post'
+import { MarkdownToolbar } from '@/components/ui/markdown-toolbar'
+
+const TITLE_MAX = 300
+const BODY_MAX  = 10000
+
+function CharCounter({ current, max }: { current: number; max: number }) {
+  const nearLimit = current > max * 0.9
+  return (
+    <span className={`text-xs tabular-nums ${nearLimit ? 'text-red-400' : 'text-slate-600'}`}>
+      {current} / {max}
+    </span>
+  )
+}
 
 function SubmitButton({ disabled }: { disabled?: boolean }) {
   const { pending } = useFormStatus()
@@ -29,7 +42,10 @@ export function CreatePostForm({ communitySlug, communityFlairs = [], error: ini
   const [imageUrl, setImageUrl]       = useState<string | null>(null)
   const [uploading, setUploading]     = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [titleLen, setTitleLen]       = useState(0)
+  const [bodyLen, setBodyLen]         = useState(0)
+  const fileInputRef  = useRef<HTMLInputElement>(null)
+  const bodyRef       = useRef<HTMLTextAreaElement>(null)
 
   async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -58,14 +74,18 @@ export function CreatePostForm({ communitySlug, communityFlairs = [], error: ini
       )}
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-zinc-300">
-          Title <span className="text-red-400">*</span>
-        </label>
+        <div className="mb-1 flex items-center justify-between">
+          <label className="text-sm font-medium text-zinc-300">
+            Title <span className="text-red-400">*</span>
+          </label>
+          <CharCounter current={titleLen} max={TITLE_MAX} />
+        </div>
         <input
           name="title"
           required
-          maxLength={300}
+          maxLength={TITLE_MAX}
           placeholder="Post title"
+          onChange={e => setTitleLen(e.target.value.length)}
           className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-indigo-500 focus:outline-none"
         />
       </div>
@@ -86,13 +106,22 @@ export function CreatePostForm({ communitySlug, communityFlairs = [], error: ini
       )}
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-zinc-300">Body</label>
-        <textarea
-          name="body"
-          rows={5}
-          placeholder="What's on your mind? (optional)"
-          className="w-full resize-none rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-indigo-500 focus:outline-none"
-        />
+        <div className="mb-1 flex items-center justify-between">
+          <label className="text-sm font-medium text-zinc-300">Body</label>
+          <CharCounter current={bodyLen} max={BODY_MAX} />
+        </div>
+        <div className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 pt-2 pb-1 focus-within:border-indigo-500">
+          <MarkdownToolbar textareaRef={bodyRef} onUpdate={v => setBodyLen(v.length)} />
+          <textarea
+            ref={bodyRef}
+            name="body"
+            rows={5}
+            maxLength={BODY_MAX}
+            placeholder="What's on your mind? (optional)"
+            onChange={e => setBodyLen(e.target.value.length)}
+            className="w-full resize-none bg-transparent text-sm text-white placeholder-zinc-500 focus:outline-none"
+          />
+        </div>
       </div>
 
       <div>

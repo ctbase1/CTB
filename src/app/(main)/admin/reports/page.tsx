@@ -54,7 +54,11 @@ export default async function AdminReportsPage() {
                 <div className="mb-2 flex items-start justify-between gap-4">
                   <div className="space-y-1">
                     <p className="text-xs text-zinc-500">
-                      <span className="font-medium text-zinc-300">{reporter?.username ?? 'unknown'}</span>
+                      {reporter?.username ? (
+                        <a href={`/u/${reporter.username}`} className="font-medium text-zinc-300 hover:text-violet-400 transition-colors">{reporter.username}</a>
+                      ) : (
+                        <span className="font-medium text-zinc-300">unknown</span>
+                      )}
                       {' '}reported a{' '}
                       <span className="font-medium text-zinc-300">{report.target_type}</span>
                       {' · '}

@@ -5,7 +5,7 @@ import { PostCard } from '@/components/post-card'
 import type { Membership } from '@/types/database'
 
 interface Props {
-  searchParams: { tab?: string }
+  searchParams: { tab?: string; limit?: string }
 }
 
 const TABS = [
@@ -15,6 +15,7 @@ const TABS = [
 ]
 
 export default async function HomePage({ searchParams }: Props) {
+  const pageLimit = Math.min(Math.max(Number(searchParams.limit ?? 20), 20), 100)
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -72,7 +73,7 @@ export default async function HomePage({ searchParams }: Props) {
         .in('community_id', myIds)
         .eq('is_removed', false)
         .order('created_at', { ascending: false })
-        .limit(20)
+        .limit(pageLimit)
 
       posts = (rawPosts ?? []) as FeedPost[]
     }
@@ -82,7 +83,7 @@ export default async function HomePage({ searchParams }: Props) {
       .select('*, view_count, author:profiles!author_id(username), community:communities!community_id(name,slug)')
       .eq('is_removed', false)
       .order('created_at', { ascending: false })
-      .limit(20)
+      .limit(pageLimit)
 
     posts = (rawPosts ?? []) as FeedPost[]
   } else {
@@ -172,21 +173,31 @@ export default async function HomePage({ searchParams }: Props) {
             </div>
           ) : posts.length === 0 ? (
             <div className="rounded-xl border border-slate-700/50 bg-slate-900 p-8 text-center">
-              <p className="text-slate-400">No posts yet in your communities.</p>
+              <p className="text-sm font-medium text-slate-400">Nothing here yet</p>
+              <p className="mt-1 text-xs text-slate-600">Your communities haven&apos;t posted anything yet. Check back soon.</p>
             </div>
           ) : (
-            posts.map(p => (
-              <PostCard
-                key={p.id}
-                post={p}
-                likeCount={likeCountMap.get(p.id) ?? 0}
-                commentCount={commentCountMap.get(p.id) ?? 0}
-                communitySlug={p.community?.slug ?? ''}
-                isSaved={savedPostIds.has(p.id)}
-                initialLiked={likedPostIds.has(p.id)}
-                userId={user?.id ?? null}
-              />
-            ))
+            <>
+              {posts.map(p => (
+                <PostCard
+                  key={p.id}
+                  post={p}
+                  likeCount={likeCountMap.get(p.id) ?? 0}
+                  commentCount={commentCountMap.get(p.id) ?? 0}
+                  communitySlug={p.community?.slug ?? ''}
+                  isSaved={savedPostIds.has(p.id)}
+                  initialLiked={likedPostIds.has(p.id)}
+                  userId={user?.id ?? null}
+                />
+              ))}
+              {posts.length === pageLimit && (
+                <div className="pt-2 text-center">
+                  <Link href={`/?tab=feed&limit=${pageLimit + 20}`} className="text-sm text-violet-400 hover:underline">
+                    Load more
+                  </Link>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
@@ -196,21 +207,31 @@ export default async function HomePage({ searchParams }: Props) {
         <div className="space-y-3">
           {posts.length === 0 ? (
             <div className="rounded-xl border border-slate-700/50 bg-slate-900 p-8 text-center">
-              <p className="text-slate-400">No posts yet.</p>
+              <p className="text-sm font-medium text-slate-400">Nothing posted yet</p>
+              <p className="mt-1 text-xs text-slate-600">Be the first to join a community and share something.</p>
             </div>
           ) : (
-            posts.map(p => (
-              <PostCard
-                key={p.id}
-                post={p}
-                likeCount={likeCountMap.get(p.id) ?? 0}
-                commentCount={commentCountMap.get(p.id) ?? 0}
-                communitySlug={p.community?.slug ?? ''}
-                isSaved={savedPostIds.has(p.id)}
-                initialLiked={likedPostIds.has(p.id)}
-                userId={user?.id ?? null}
-              />
-            ))
+            <>
+              {posts.map(p => (
+                <PostCard
+                  key={p.id}
+                  post={p}
+                  likeCount={likeCountMap.get(p.id) ?? 0}
+                  commentCount={commentCountMap.get(p.id) ?? 0}
+                  communitySlug={p.community?.slug ?? ''}
+                  isSaved={savedPostIds.has(p.id)}
+                  initialLiked={likedPostIds.has(p.id)}
+                  userId={user?.id ?? null}
+                />
+              ))}
+              {posts.length === pageLimit && (
+                <div className="pt-2 text-center">
+                  <Link href={`/?tab=all&limit=${pageLimit + 20}`} className="text-sm text-violet-400 hover:underline">
+                    Load more
+                  </Link>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}

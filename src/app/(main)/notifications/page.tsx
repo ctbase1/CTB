@@ -47,7 +47,9 @@ export default async function NotificationsPage() {
 
       {list.length === 0 ? (
         <div className="rounded-2xl border border-slate-700/50 bg-slate-900 py-16 text-center">
-          <p className="text-sm text-slate-500">No notifications yet.</p>
+          <Bell className="mx-auto mb-3 h-8 w-8 text-slate-700" />
+          <p className="text-sm font-medium text-slate-400">You&apos;re all caught up</p>
+          <p className="mt-1 text-xs text-slate-600">Notifications from likes, comments, and follows will appear here.</p>
         </div>
       ) : (
         <div className="space-y-2">

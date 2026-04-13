@@ -97,3 +97,49 @@ export async function createCommunity(formData: FormData) {
   revalidatePath('/')
   redirect(`/c/${community.slug}`)
 }
+
+export async function setMemberFlair(communityId: string, flair: string) {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const cleanFlair = flair.trim().slice(0, 40)
+
+  const { error } = await supabase
+    .from('memberships')
+    .update({ flair: cleanFlair || null })
+    .eq('community_id', communityId)
+    .eq('user_id', user.id)
+
+  if (error) return { error: error.message }
+
+  revalidatePath(`/c`)
+  return { success: true }
+}
+
+export async function clearMemberFlair(communityId: string, userId: string) {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  // Verify caller is a mod/admin
+  const { data: callerMembership } = await supabase
+    .from('memberships')
+    .select('role')
+    .eq('community_id', communityId)
+    .eq('user_id', user.id)
+    .single()
+
+  if (!callerMembership || !['admin', 'moderator'].includes(callerMembership.role)) {
+    return { error: 'Not authorized' }
+  }
+
+  await supabase
+    .from('memberships')
+    .update({ flair: null })
+    .eq('community_id', communityId)
+    .eq('user_id', userId)
+
+  revalidatePath(`/c`)
+  return { success: true }
+}

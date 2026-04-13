@@ -1,0 +1,18 @@
+export const DEFAULT_FLAIRS: string[] = [
+  'Diamond Hands',
+  'Paper Hands',
+  'HODLer',
+  'BTC Maxi',
+  'ETH Maxi',
+  'DeFi Degen',
+  'NFT Collector',
+  'Altcoin Hunter',
+  'Bear Market Survivor',
+  'Bull Run Chaser',
+  'Crypto OG',
+  'Moon Boy',
+  'Whale',
+  'Shrimp',
+  'Degen',
+  'Long-Term Investor',
+]

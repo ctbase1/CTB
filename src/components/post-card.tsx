@@ -32,9 +32,12 @@ interface Props {
   isSaved?: boolean
   initialLiked?: boolean
   userId?: string | null
+  authorFlair?: string | null
 }
 
-export function PostCard({ post, likeCount, commentCount, communitySlug, isSaved, initialLiked, userId }: Props) {
+export function PostCard({ post, likeCount, commentCount, communitySlug, isSaved, initialLiked, userId, authorFlair }: Props) {
+  const authorUsername = post.author?.username ?? null
+
   return (
     <div className="group relative rounded-2xl border border-slate-700/50 bg-slate-900 transition-all hover:border-violet-500/30 hover:shadow-glow-violet">
       {post.is_pinned && (
@@ -44,9 +47,10 @@ export function PostCard({ post, likeCount, commentCount, communitySlug, isSaved
         </div>
       )}
 
+      {/* Main clickable area — title + image + preview only */}
       <Link
         href={`/c/${communitySlug}/${post.id}`}
-        className="flex gap-4 p-5"
+        className="flex gap-4 px-5 pt-5 pb-2"
       >
         {post.image_url && (
           <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-slate-800">
@@ -60,11 +64,6 @@ export function PostCard({ post, likeCount, commentCount, communitySlug, isSaved
             </span>
           )}
           <h3 className="line-clamp-2 font-semibold text-white leading-snug">{post.title}</h3>
-          <p className="mt-1 text-xs text-slate-500">
-            by {post.author?.username ?? 'unknown'} ·{' '}
-            {new Date(post.created_at).toLocaleDateString()}
-            {post.edited_at && <span className="ml-1 italic">· edited</span>}
-          </p>
 
           {post.link_preview && (
             <div className="mt-2.5 flex items-start gap-3 overflow-hidden rounded-xl border border-slate-700 bg-slate-800 p-2.5 border-l-2 border-l-violet-500">
@@ -93,6 +92,27 @@ export function PostCard({ post, likeCount, commentCount, communitySlug, isSaved
         </div>
       </Link>
 
+      {/* Byline — separate row so username can be its own link */}
+      <div className="flex items-center gap-1.5 px-5 pb-2 text-xs text-slate-500">
+        <span>by</span>
+        {authorUsername ? (
+          <Link href={`/u/${authorUsername}`} className="font-medium text-slate-400 hover:text-violet-400 transition-colors">
+            {authorUsername}
+          </Link>
+        ) : (
+          <span>unknown</span>
+        )}
+        {authorFlair && (
+          <span className="rounded-full border border-violet-800/40 bg-slate-800 px-1.5 py-0.5 text-[10px] font-medium text-violet-400">
+            {authorFlair}
+          </span>
+        )}
+        <span>·</span>
+        <span>{new Date(post.created_at).toLocaleDateString()}</span>
+        {post.edited_at && <span className="italic">· edited</span>}
+      </div>
+
+      {/* Action bar */}
       <div className="px-5 pb-4">
         <PostActionBar
           post={post}

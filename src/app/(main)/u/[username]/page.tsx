@@ -4,11 +4,15 @@ import Image from 'next/image'
 import { FollowButton } from '@/components/follow-button'
 import { PostCard } from '@/components/post-card'
 
+import Link from 'next/link'
+
 interface Props {
   params: { username: string }
+  searchParams: { limit?: string }
 }
 
-export default async function ProfilePage({ params }: Props) {
+export default async function ProfilePage({ params, searchParams }: Props) {
+  const pageLimit = Math.min(Math.max(Number(searchParams.limit ?? 20), 20), 100)
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -66,7 +70,7 @@ export default async function ProfilePage({ params }: Props) {
       .eq('author_id', profile.id)
       .eq('is_removed', false)
       .order('created_at', { ascending: false })
-      .limit(20),
+      .limit(pageLimit),
   ])
 
   const isFollowing = !!followRow
@@ -173,6 +177,13 @@ export default async function ProfilePage({ params }: Props) {
                 />
               )
             })}
+            {posts.length === pageLimit && (
+              <div className="pt-2 text-center">
+                <Link href={`?limit=${pageLimit + 20}`} className="text-sm text-violet-400 hover:underline">
+                  Load more
+                </Link>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -33,16 +33,20 @@ export default async function CommunityPage({ params, searchParams }: Props) {
     .select('*', { count: 'exact', head: true })
     .eq('community_id', community.id)
 
-  // Current user membership
+  // Current user membership + flair
   let membership: Pick<Membership, 'role'> | null = null
+  let userFlair: string | null = null
   if (user) {
     const { data } = await supabase
       .from('memberships')
-      .select('role')
+      .select('role, flair')
       .eq('community_id', community.id)
       .eq('user_id', user.id)
       .single()
-    membership = data
+    if (data) {
+      membership = { role: data.role }
+      userFlair = data.flair ?? null
+    }
   }
 
   // Fetch posts with author — pinned first, then by created_at desc
@@ -80,6 +84,23 @@ export default async function CommunityPage({ params, searchParams }: Props) {
     }
     for (const { post_id } of commentRows ?? []) {
       commentCountMap.set(post_id, (commentCountMap.get(post_id) ?? 0) + 1)
+    }
+  }
+
+  // Author flairs for this community
+  const authorFlairMap = new Map<string, string>()
+  if (postIds.length > 0) {
+    const authorIds = Array.from(new Set(posts.map(p => p.author_id).filter(Boolean)))
+    if (authorIds.length > 0) {
+      const { data: flairRows } = await supabase
+        .from('memberships')
+        .select('user_id, flair')
+        .eq('community_id', community.id)
+        .in('user_id', authorIds)
+        .not('flair', 'is', null)
+      for (const row of flairRows ?? []) {
+        if (row.flair) authorFlairMap.set(row.user_id, row.flair)
+      }
     }
   }
 
@@ -210,6 +231,7 @@ export default async function CommunityPage({ params, searchParams }: Props) {
                   isSaved={savedPostIds.has(p.id)}
                   initialLiked={likedPostIds.has(p.id)}
                   userId={user?.id ?? null}
+                  authorFlair={authorFlairMap.get(p.author_id) ?? null}
                 />
               ))}
               {posts.length === pageLimit && (
@@ -234,6 +256,10 @@ export default async function CommunityPage({ params, searchParams }: Props) {
           description={community.description}
           memberCount={count}
           createdAt={community.created_at}
+          communityId={community.id}
+          userId={user?.id ?? null}
+          userFlair={userFlair}
+          isMember={!!membership}
         />
       </div>
     </div>
