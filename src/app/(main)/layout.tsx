@@ -6,6 +6,7 @@ import { Sidebar } from '@/components/sidebar'
 import { MobileHeader } from '@/components/mobile-header'
 import { BottomTabBar } from '@/components/bottom-tab-bar'
 import { RightPanel } from '@/components/right-panel'
+import { PageTransition } from '@/components/page-transition'
 
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient()
@@ -39,7 +40,9 @@ export default async function MainLayout({ children }: { children: React.ReactNo
         <div className="flex flex-1">
           <main className="flex-1 min-w-0 py-6 px-4 pb-24 md:pb-6" style={{ overscrollBehaviorY: 'contain' }}>
             <div className="mx-auto w-full max-w-2xl">
-              {children}
+              <PageTransition>
+                {children}
+              </PageTransition>
             </div>
           </main>
 

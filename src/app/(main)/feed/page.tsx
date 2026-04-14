@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { CommunityCard } from '@/components/community-card'
 import { PostCard } from '@/components/post-card'
 import { PostCardSkeleton, CommunityCardSkeleton } from '@/components/ui/skeleton'
+import { StaggeredList } from '@/components/staggered-list'
+import { FadeIn } from '@/components/page-transition'
 import type { Membership } from '@/types/database'
 
 interface Props {
@@ -197,7 +199,7 @@ export default async function FeedPage({ searchParams }: Props) {
       {/* My Feed tab */}
       {tab === 'feed' && (
         <Suspense fallback={<PostListSkeleton />}>
-          <div className="space-y-3">
+          <FadeIn>
           {myIds.length === 0 ? (
             <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center">
               <p className="text-[var(--muted-foreground)] mb-2">You haven&apos;t joined any communities yet.</p>
@@ -212,18 +214,20 @@ export default async function FeedPage({ searchParams }: Props) {
             </div>
           ) : (
             <>
-              {posts.map(p => (
-                <PostCard
-                  key={p.id}
-                  post={p}
-                  likeCount={likeCountMap.get(p.id) ?? 0}
-                  commentCount={commentCountMap.get(p.id) ?? 0}
-                  communitySlug={p.community?.slug ?? ''}
-                  isSaved={savedPostIds.has(p.id)}
-                  initialLiked={likedPostIds.has(p.id)}
-                  userId={user?.id ?? null}
-                />
-              ))}
+              <StaggeredList className="space-y-3">
+                {posts.map(p => (
+                  <PostCard
+                    key={p.id}
+                    post={p}
+                    likeCount={likeCountMap.get(p.id) ?? 0}
+                    commentCount={commentCountMap.get(p.id) ?? 0}
+                    communitySlug={p.community?.slug ?? ''}
+                    isSaved={savedPostIds.has(p.id)}
+                    initialLiked={likedPostIds.has(p.id)}
+                    userId={user?.id ?? null}
+                  />
+                ))}
+              </StaggeredList>
               {posts.length === pageLimit && (
                 <div className="pt-2 text-center">
                   <Link href={`/feed?tab=feed&limit=${pageLimit + 20}`} className="text-sm text-[var(--accent)] hover:underline">
@@ -233,14 +237,14 @@ export default async function FeedPage({ searchParams }: Props) {
               )}
             </>
           )}
-          </div>
+          </FadeIn>
         </Suspense>
       )}
 
       {/* All tab */}
       {tab === 'all' && (
         <Suspense fallback={<PostListSkeleton />}>
-          <div className="space-y-3">
+          <FadeIn>
           {posts.length === 0 ? (
             <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center">
               <p className="text-sm font-medium text-[var(--muted-foreground)]">Nothing posted yet</p>
@@ -248,18 +252,20 @@ export default async function FeedPage({ searchParams }: Props) {
             </div>
           ) : (
             <>
-              {posts.map(p => (
-                <PostCard
-                  key={p.id}
-                  post={p}
-                  likeCount={likeCountMap.get(p.id) ?? 0}
-                  commentCount={commentCountMap.get(p.id) ?? 0}
-                  communitySlug={p.community?.slug ?? ''}
-                  isSaved={savedPostIds.has(p.id)}
-                  initialLiked={likedPostIds.has(p.id)}
-                  userId={user?.id ?? null}
-                />
-              ))}
+              <StaggeredList className="space-y-3">
+                {posts.map(p => (
+                  <PostCard
+                    key={p.id}
+                    post={p}
+                    likeCount={likeCountMap.get(p.id) ?? 0}
+                    commentCount={commentCountMap.get(p.id) ?? 0}
+                    communitySlug={p.community?.slug ?? ''}
+                    isSaved={savedPostIds.has(p.id)}
+                    initialLiked={likedPostIds.has(p.id)}
+                    userId={user?.id ?? null}
+                  />
+                ))}
+              </StaggeredList>
               {posts.length === pageLimit && (
                 <div className="pt-2 text-center">
                   <Link href={`/feed?tab=all&limit=${pageLimit + 20}`} className="text-sm text-[var(--accent)] hover:underline">
@@ -269,13 +275,14 @@ export default async function FeedPage({ searchParams }: Props) {
               )}
             </>
           )}
-          </div>
+          </FadeIn>
         </Suspense>
       )}
 
       {/* Communities tab */}
       {tab === 'communities' && (
         <Suspense fallback={<CommunityListSkeleton />}>
+          <FadeIn>
           <div>
           {/* Sort control */}
           <div className="flex items-center gap-1 mb-4">
@@ -317,6 +324,7 @@ export default async function FeedPage({ searchParams }: Props) {
             )}
           </div>
           </div>
+          </FadeIn>
         </Suspense>
       )}
     </div>

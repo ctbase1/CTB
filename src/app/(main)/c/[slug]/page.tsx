@@ -10,6 +10,8 @@ import { Settings, PenSquare } from 'lucide-react'
 import type { Membership } from '@/types/database'
 import { Suspense } from 'react'
 import { PostCardSkeleton } from '@/components/ui/skeleton'
+import { StaggeredList } from '@/components/staggered-list'
+import { FadeIn } from '@/components/page-transition'
 
 function PostListSkeleton() {
   return (
@@ -255,23 +257,25 @@ export default async function CommunityPage({ params, searchParams }: Props) {
             </div>
           ) : (
             <Suspense fallback={<PostListSkeleton />}>
-              <div className="space-y-3">
-                {posts.map(p => (
-                  <PostCard
-                    key={p.id}
-                    post={{
-                      ...p,
-                      author: p.author as { username: string } | null,
-                    }}
-                    likeCount={likeCountMap.get(p.id) ?? 0}
-                    commentCount={commentCountMap.get(p.id) ?? 0}
-                    communitySlug={community.slug}
-                    isSaved={savedPostIds.has(p.id)}
-                    initialLiked={likedPostIds.has(p.id)}
-                    userId={user?.id ?? null}
-                    authorFlair={authorFlairMap.get(p.author_id) ?? null}
-                  />
-                ))}
+              <FadeIn>
+                <StaggeredList className="space-y-3">
+                  {posts.map(p => (
+                    <PostCard
+                      key={p.id}
+                      post={{
+                        ...p,
+                        author: p.author as { username: string } | null,
+                      }}
+                      likeCount={likeCountMap.get(p.id) ?? 0}
+                      commentCount={commentCountMap.get(p.id) ?? 0}
+                      communitySlug={community.slug}
+                      isSaved={savedPostIds.has(p.id)}
+                      initialLiked={likedPostIds.has(p.id)}
+                      userId={user?.id ?? null}
+                      authorFlair={authorFlairMap.get(p.author_id) ?? null}
+                    />
+                  ))}
+                </StaggeredList>
                 {posts.length === pageLimit && (
                   <div className="pt-2 text-center">
                     <Link
@@ -282,7 +286,7 @@ export default async function CommunityPage({ params, searchParams }: Props) {
                     </Link>
                   </div>
                 )}
-              </div>
+              </FadeIn>
             </Suspense>
           )}
         </div>
