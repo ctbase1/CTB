@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Sidebar } from '@/components/sidebar'
 import { MobileHeader } from '@/components/mobile-header'
 import { BottomTabBar } from '@/components/bottom-tab-bar'
+import { RightPanel } from '@/components/right-panel'
 
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient()
@@ -24,22 +25,29 @@ export default async function MainLayout({ children }: { children: React.ReactNo
   if (!profile) redirect('/login')
 
   return (
-    <div className="min-h-screen bg-hero-glow text-[var(--foreground)]">
-      {/* Desktop sidebar — hidden on mobile, shows from md+ */}
+    <div className="min-h-screen bg-ambient text-[var(--foreground)]">
+      {/* Desktop sidebar */}
       <Sidebar profile={profile} unreadCount={unreadCount ?? 0} />
 
       {/* Content column — offset by sidebar width on md+ */}
       <div className="flex flex-col min-h-screen md:ml-16 lg:ml-64">
-        {/* Mobile header — only visible on mobile */}
+        {/* Mobile header */}
         <MobileHeader />
 
-        {/* Page content */}
-        <main className="flex-1 mx-auto w-full max-w-2xl px-4 py-6 pb-24 md:pb-6">
-          {children}
-        </main>
+        {/* Main content row (feed + right panel) */}
+        <div className="flex flex-1">
+          <main className="flex-1 min-w-0 py-6 px-4 pb-24 md:pb-6">
+            <div className="mx-auto w-full max-w-2xl">
+              {children}
+            </div>
+          </main>
 
-        {/* Desktop footer — hidden on mobile */}
-        <footer className="hidden md:block border-t border-[var(--border)] mt-16">
+          {/* Right panel — xl+ only, sticky */}
+          <RightPanel userId={user.id} />
+        </div>
+
+        {/* Desktop footer */}
+        <footer className="hidden md:block border-t border-[var(--border)] mt-8">
           <div className="mx-auto max-w-2xl px-4 py-6 flex flex-wrap items-center gap-x-5 gap-y-1">
             <span className="text-xs font-semibold text-[var(--accent)]">CTB</span>
             <Link href="/terms"      className="text-xs text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">Terms</Link>
@@ -50,7 +58,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
         </footer>
       </div>
 
-      {/* Mobile bottom tab bar — only visible on mobile */}
+      {/* Mobile bottom tab bar */}
       <BottomTabBar profile={profile} unreadCount={unreadCount ?? 0} />
     </div>
   )

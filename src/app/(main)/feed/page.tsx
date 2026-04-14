@@ -136,18 +136,18 @@ export default async function FeedPage({ searchParams }: Props) {
   }
 
   return (
-    <div className="space-y-6">
+    <div>
       {/* Tab nav */}
-      <div className="flex items-center justify-between">
-        <div className="flex gap-1 rounded-2xl border border-slate-700/50 bg-slate-900 p-1">
+      <div className="flex items-center justify-between border-b border-[var(--border)] mb-6">
+        <div className="flex gap-0">
           {TABS.map(t => (
             <Link
               key={t.id}
               href={`/feed?tab=${t.id}`}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
+              className={`px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px ${
                 tab === t.id
-                  ? 'bg-violet-600 text-white shadow-glow-violet-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'border-[var(--accent)] text-[var(--foreground)]'
+                  : 'border-transparent text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
               }`}
             >
               {t.label}
@@ -155,7 +155,7 @@ export default async function FeedPage({ searchParams }: Props) {
           ))}
         </div>
         {user && (
-          <Link href="/c/new" className="text-sm text-violet-400 hover:underline">
+          <Link href="/c/new" className="mb-1 text-sm text-[var(--muted-foreground)] hover:text-[var(--accent)] transition-colors">
             + Create
           </Link>
         )}
@@ -165,16 +165,16 @@ export default async function FeedPage({ searchParams }: Props) {
       {tab === 'feed' && (
         <div className="space-y-3">
           {myIds.length === 0 ? (
-            <div className="rounded-xl border border-slate-700/50 bg-slate-900 p-8 text-center">
-              <p className="text-slate-400 mb-2">You haven&apos;t joined any communities yet.</p>
-              <Link href="/feed?tab=communities" className="text-sm text-violet-400 hover:underline">
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center">
+              <p className="text-[var(--muted-foreground)] mb-2">You haven&apos;t joined any communities yet.</p>
+              <Link href="/feed?tab=communities" className="text-sm text-[var(--accent)] hover:underline">
                 Browse communities →
               </Link>
             </div>
           ) : posts.length === 0 ? (
-            <div className="rounded-xl border border-slate-700/50 bg-slate-900 p-8 text-center">
-              <p className="text-sm font-medium text-slate-400">Nothing here yet</p>
-              <p className="mt-1 text-xs text-slate-600">Your communities haven&apos;t posted anything yet. Check back soon.</p>
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center">
+              <p className="text-sm font-medium text-[var(--muted-foreground)]">Nothing here yet</p>
+              <p className="mt-1 text-xs text-[var(--muted)]">Your communities haven&apos;t posted anything yet. Check back soon.</p>
             </div>
           ) : (
             <>
@@ -192,7 +192,7 @@ export default async function FeedPage({ searchParams }: Props) {
               ))}
               {posts.length === pageLimit && (
                 <div className="pt-2 text-center">
-                  <Link href={`/feed?tab=feed&limit=${pageLimit + 20}`} className="text-sm text-violet-400 hover:underline">
+                  <Link href={`/feed?tab=feed&limit=${pageLimit + 20}`} className="text-sm text-[var(--accent)] hover:underline">
                     Load more
                   </Link>
                 </div>
@@ -206,9 +206,9 @@ export default async function FeedPage({ searchParams }: Props) {
       {tab === 'all' && (
         <div className="space-y-3">
           {posts.length === 0 ? (
-            <div className="rounded-xl border border-slate-700/50 bg-slate-900 p-8 text-center">
-              <p className="text-sm font-medium text-slate-400">Nothing posted yet</p>
-              <p className="mt-1 text-xs text-slate-600">Be the first to join a community and share something.</p>
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center">
+              <p className="text-sm font-medium text-[var(--muted-foreground)]">Nothing posted yet</p>
+              <p className="mt-1 text-xs text-[var(--muted)]">Be the first to join a community and share something.</p>
             </div>
           ) : (
             <>
@@ -226,7 +226,7 @@ export default async function FeedPage({ searchParams }: Props) {
               ))}
               {posts.length === pageLimit && (
                 <div className="pt-2 text-center">
-                  <Link href={`/feed?tab=all&limit=${pageLimit + 20}`} className="text-sm text-violet-400 hover:underline">
+                  <Link href={`/feed?tab=all&limit=${pageLimit + 20}`} className="text-sm text-[var(--accent)] hover:underline">
                     Load more
                   </Link>
                 </div>
@@ -240,10 +240,10 @@ export default async function FeedPage({ searchParams }: Props) {
       {tab === 'communities' && (
         <div className="space-y-2">
           {allCommunities.length === 0 ? (
-            <div className="rounded-xl border border-slate-700/50 bg-slate-900 py-16 text-center">
-              <p className="mb-4 text-sm text-slate-500">No communities yet.</p>
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] py-16 text-center">
+              <p className="mb-4 text-sm text-[var(--muted-foreground)]">No communities yet.</p>
               {user && (
-                <Link href="/c/new" className="text-sm text-violet-400 hover:underline">
+                <Link href="/c/new" className="text-sm text-[var(--accent)] hover:underline">
                   Be the first to create one →
                 </Link>
               )}
