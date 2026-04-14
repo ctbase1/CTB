@@ -4,13 +4,14 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { JoinButton } from '@/components/join-button'
 import { PostCard } from '@/components/post-card'
-import { CommunitySidebar } from '@/components/community-sidebar'
+import { CommunityTabs } from '@/components/community-tabs'
+import { AboutTab } from '@/components/about-tab'
 import { Settings, PenSquare } from 'lucide-react'
 import type { Membership } from '@/types/database'
 
 interface Props {
   params: { slug: string }
-  searchParams: { error?: string; limit?: string }
+  searchParams: { error?: string; limit?: string; tab?: string }
 }
 
 export default async function CommunityPage({ params, searchParams }: Props) {
@@ -127,68 +128,79 @@ export default async function CommunityPage({ params, searchParams }: Props) {
 
   const isAdmin = membership?.role === 'admin'
   const count   = memberCount ?? 0
+  const currentTab = searchParams.tab === 'about' ? 'about' : 'posts'
 
   return (
-    <div className="flex gap-6">
-      {/* Main feed */}
-      <div className="min-w-0 flex-1">
-        {/* Banner hero */}
-        <div className="relative mb-0 h-32 w-full overflow-hidden rounded-2xl lg:h-44">
-          {community.banner_url ? (
-            <Image src={community.banner_url} alt={community.name} fill className="object-cover" />
-          ) : (
-            <div className="h-full w-full bg-gradient-to-br from-violet-900 via-slate-900 to-slate-950" />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        </div>
-
-        {/* Header — overlaps banner */}
-        <div className="flex items-end justify-between gap-4 -mt-6 px-1">
-          <div>
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-slate-900 bg-gradient-to-br from-violet-600 to-violet-900 text-xl font-bold text-white shadow-lg">
-              {community.name[0].toUpperCase()}
-            </div>
-          </div>
-          <div className="flex shrink-0 items-center gap-2 pb-1">
-            {isAdmin && (
-              <Link
-                href={`/c/${community.slug}/settings`}
-                className="flex items-center gap-1.5 rounded-xl border border-slate-700 px-3 py-1.5 text-xs text-slate-400 hover:border-violet-500 hover:text-violet-400 transition-colors"
-              >
-                <Settings className="h-3.5 w-3.5" />
-                Settings
-              </Link>
-            )}
-            <JoinButton
-              communityId={community.id}
-              communitySlug={community.slug}
-              membership={membership}
-              isLoggedIn={!!user}
-            />
-          </div>
-        </div>
-
-        {/* Community name + meta */}
-        <div className="mt-3 px-1">
-          <h1 className="text-2xl font-bold tracking-tight text-white">{community.name}</h1>
-          <p className="mt-0.5 text-sm text-slate-500">
-            c/{community.slug} · <span className="text-slate-400">{count.toLocaleString()} {count === 1 ? 'member' : 'members'}</span>
-          </p>
-          {community.description && (
-            <p className="mt-2 max-w-lg text-sm text-slate-400 leading-relaxed">{community.description}</p>
-          )}
-        </div>
-
-        {searchParams.error === 'admins-cannot-leave' && (
-          <p className="mt-4 rounded-xl border border-red-900/50 bg-red-950/30 px-4 py-2 text-sm text-red-400">
-            Community admins cannot leave. Delete the community instead.
-          </p>
+    <div className="min-w-0">
+      {/* Banner hero */}
+      <div className="relative mb-0 h-32 w-full overflow-hidden rounded-2xl lg:h-44">
+        {community.banner_url ? (
+          <Image src={community.banner_url} alt={community.name} fill className="object-cover" />
+        ) : (
+          <div className="h-full w-full bg-gradient-to-br from-blue-900 via-slate-900 to-[var(--background)]" />
         )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+      </div>
 
-        {/* Posts feed */}
-        <div className="mt-8">
+      {/* Header — overlaps banner */}
+      <div className="flex items-end justify-between gap-4 -mt-6 px-1">
+        <div>
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-[var(--background)] bg-gradient-to-br from-blue-600 to-blue-900 text-xl font-bold text-white shadow-lg">
+            {community.name[0].toUpperCase()}
+          </div>
+        </div>
+        <div className="flex shrink-0 items-center gap-2 pb-1">
+          {isAdmin && (
+            <Link
+              href={`/c/${community.slug}/settings`}
+              className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] px-3 py-1.5 text-xs text-[var(--muted-foreground)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors"
+            >
+              <Settings className="h-3.5 w-3.5" />
+              Settings
+            </Link>
+          )}
+          <JoinButton
+            communityId={community.id}
+            communitySlug={community.slug}
+            membership={membership}
+            isLoggedIn={!!user}
+          />
+        </div>
+      </div>
+
+      {/* Community name + meta */}
+      <div className="mt-3 px-1">
+        <h1 className="text-2xl font-bold tracking-tight text-[var(--foreground)]">{community.name}</h1>
+        <p className="mt-0.5 text-sm text-[var(--muted)]">
+          c/{community.slug} · <span className="text-[var(--muted-foreground)]">{count.toLocaleString()} {count === 1 ? 'member' : 'members'}</span>
+        </p>
+      </div>
+
+      {searchParams.error === 'admins-cannot-leave' && (
+        <p className="mt-4 rounded-xl border border-red-900/50 bg-red-950/30 px-4 py-2 text-sm text-red-400">
+          Community admins cannot leave. Delete the community instead.
+        </p>
+      )}
+
+      {/* Tab bar */}
+      <CommunityTabs slug={community.slug} currentTab={currentTab} />
+
+      {/* Tab content */}
+      {currentTab === 'about' ? (
+        <AboutTab
+          rules={community.rules}
+          description={community.description}
+          memberCount={count}
+          createdAt={community.created_at}
+          communityId={community.id}
+          userId={user?.id ?? null}
+          userFlair={userFlair}
+          isMember={!!membership}
+        />
+      ) : (
+        <div className="mt-6">
           <div className="mb-4 flex items-center justify-between">
-            <p className="text-sm font-medium text-slate-500">
+            <p className="text-sm font-medium text-[var(--muted-foreground)]">
               {posts.length > 0
                 ? `${posts.length} post${posts.length === 1 ? '' : 's'}`
                 : 'Posts'}
@@ -196,7 +208,7 @@ export default async function CommunityPage({ params, searchParams }: Props) {
             {membership && (
               <Link
                 href={`/c/${community.slug}/submit`}
-                className="flex items-center gap-1.5 rounded-xl bg-violet-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-violet-500 transition-colors"
+                className="flex items-center gap-1.5 rounded-xl bg-[var(--accent)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[var(--accent-hover)] transition-colors"
               >
                 <PenSquare className="h-3.5 w-3.5" />
                 New Post
@@ -205,12 +217,12 @@ export default async function CommunityPage({ params, searchParams }: Props) {
           </div>
 
           {posts.length === 0 ? (
-            <div className="rounded-2xl border border-slate-700/50 bg-slate-900 py-16 text-center">
-              <p className="text-sm text-slate-500">No posts yet.</p>
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] py-16 text-center">
+              <p className="text-sm text-[var(--muted-foreground)]">No posts yet.</p>
               {membership && (
                 <Link
                   href={`/c/${community.slug}/submit`}
-                  className="mt-2 inline-block text-sm text-violet-400 hover:underline"
+                  className="mt-2 inline-block text-sm text-[var(--accent)] hover:underline"
                 >
                   Be the first to post →
                 </Link>
@@ -238,7 +250,7 @@ export default async function CommunityPage({ params, searchParams }: Props) {
                 <div className="pt-2 text-center">
                   <Link
                     href={`?limit=${pageLimit + 20}`}
-                    className="text-sm text-violet-400 hover:underline"
+                    className="text-sm text-[var(--accent)] hover:underline"
                   >
                     Load more
                   </Link>
@@ -247,21 +259,7 @@ export default async function CommunityPage({ params, searchParams }: Props) {
             </div>
           )}
         </div>
-      </div>
-
-      {/* Sidebar */}
-      <div className="hidden w-64 shrink-0 lg:block">
-        <CommunitySidebar
-          rules={community.rules}
-          description={community.description}
-          memberCount={count}
-          createdAt={community.created_at}
-          communityId={community.id}
-          userId={user?.id ?? null}
-          userFlair={userFlair}
-          isMember={!!membership}
-        />
-      </div>
+      )}
     </div>
   )
 }
