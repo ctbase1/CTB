@@ -1,11 +1,29 @@
+import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { CommunityCard } from '@/components/community-card'
 import { PostCard } from '@/components/post-card'
+import { PostCardSkeleton, CommunityCardSkeleton } from '@/components/ui/skeleton'
 import type { Membership } from '@/types/database'
 
 interface Props {
   searchParams: { tab?: string; limit?: string; sort?: string }
+}
+
+function PostListSkeleton() {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: 5 }).map((_, i) => <PostCardSkeleton key={i} />)}
+    </div>
+  )
+}
+
+function CommunityListSkeleton() {
+  return (
+    <div className="space-y-2">
+      {Array.from({ length: 5 }).map((_, i) => <CommunityCardSkeleton key={i} />)}
+    </div>
+  )
 }
 
 const TABS = [
@@ -178,7 +196,8 @@ export default async function FeedPage({ searchParams }: Props) {
 
       {/* My Feed tab */}
       {tab === 'feed' && (
-        <div className="space-y-3">
+        <Suspense fallback={<PostListSkeleton />}>
+          <div className="space-y-3">
           {myIds.length === 0 ? (
             <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center">
               <p className="text-[var(--muted-foreground)] mb-2">You haven&apos;t joined any communities yet.</p>
@@ -214,12 +233,14 @@ export default async function FeedPage({ searchParams }: Props) {
               )}
             </>
           )}
-        </div>
+          </div>
+        </Suspense>
       )}
 
       {/* All tab */}
       {tab === 'all' && (
-        <div className="space-y-3">
+        <Suspense fallback={<PostListSkeleton />}>
+          <div className="space-y-3">
           {posts.length === 0 ? (
             <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center">
               <p className="text-sm font-medium text-[var(--muted-foreground)]">Nothing posted yet</p>
@@ -248,12 +269,14 @@ export default async function FeedPage({ searchParams }: Props) {
               )}
             </>
           )}
-        </div>
+          </div>
+        </Suspense>
       )}
 
       {/* Communities tab */}
       {tab === 'communities' && (
-        <div>
+        <Suspense fallback={<CommunityListSkeleton />}>
+          <div>
           {/* Sort control */}
           <div className="flex items-center gap-1 mb-4">
             {(['newest', 'members', 'alpha'] as const).map(s => (
@@ -293,7 +316,8 @@ export default async function FeedPage({ searchParams }: Props) {
               ))
             )}
           </div>
-        </div>
+          </div>
+        </Suspense>
       )}
     </div>
   )
