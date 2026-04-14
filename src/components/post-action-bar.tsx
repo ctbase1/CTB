@@ -92,7 +92,7 @@ export function PostActionBar({
         {/* Comment */}
         <button
           onClick={() => setShowCommentForm(v => !v)}
-          className="flex items-center gap-1.5 text-sm transition-all text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+          className="flex items-center gap-1.5 text-sm transition-all text-[var(--muted-foreground)] hover:text-[var(--foreground)] min-h-[44px] min-w-[44px] justify-center md:min-h-0 md:min-w-0 md:justify-start"
           style={showCommentForm ? { color: accent } : undefined}
         >
           <MessageSquare className="h-3.5 w-3.5" />
@@ -114,7 +114,7 @@ export function PostActionBar({
         <div ref={shareRef} className="relative">
           <button
             onClick={() => setShareOpen(v => !v)}
-            className={`flex items-center gap-1.5 text-sm transition-all ${
+            className={`flex items-center gap-1.5 text-sm transition-all min-h-[44px] min-w-[44px] justify-center md:min-h-0 md:min-w-0 ${
               copied ? 'text-green-400' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
             }`}
             style={shareOpen && !copied ? { color: accent } : undefined}

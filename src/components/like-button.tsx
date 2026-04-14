@@ -47,7 +47,7 @@ export function LikeButton({
       <button
         onClick={handleClick}
         disabled={!userId || isPending}
-        className={`flex items-center gap-1.5 text-sm transition-all disabled:opacity-50 ${
+        className={`flex items-center gap-1.5 text-sm transition-all disabled:opacity-50 min-h-[44px] min-w-[44px] justify-center md:min-h-0 md:min-w-0 md:justify-start ${
           liked ? 'scale-105' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
         }`}
         style={liked ? { color: accentColor } : undefined}

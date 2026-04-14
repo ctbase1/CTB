@@ -29,7 +29,7 @@ export function BookmarkButton({ postId, isSaved, accentColor = 'var(--accent)' 
     <button
       onClick={handleClick}
       title={optimisticSaved ? 'Remove bookmark' : 'Save post'}
-      className="flex h-7 w-7 items-center justify-center rounded-full transition-all hover:bg-[var(--surface-raised)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+      className="flex h-11 w-11 items-center justify-center rounded-full transition-all hover:bg-[var(--surface-raised)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] md:h-7 md:w-7"
       style={optimisticSaved ? { color: accentColor } : undefined}
     >
       <Bookmark
