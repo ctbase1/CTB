@@ -107,7 +107,7 @@ export function PostActionBar({
 
         {/* Save */}
         {userId && (
-          <BookmarkButton postId={post.id} isSaved={isSaved} />
+          <BookmarkButton postId={post.id} isSaved={isSaved} accentColor={accent} />
         )}
 
         {/* Share */}

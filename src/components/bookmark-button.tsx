@@ -7,9 +7,10 @@ import { Bookmark } from 'lucide-react'
 interface Props {
   postId: string
   isSaved: boolean
+  accentColor?: string
 }
 
-export function BookmarkButton({ postId, isSaved }: Props) {
+export function BookmarkButton({ postId, isSaved, accentColor = 'var(--accent)' }: Props) {
   const [optimisticSaved, setOptimisticSaved] = useOptimistic(isSaved)
   const [, startTransition] = useTransition()
 
@@ -28,11 +29,13 @@ export function BookmarkButton({ postId, isSaved }: Props) {
     <button
       onClick={handleClick}
       title={optimisticSaved ? 'Remove bookmark' : 'Save post'}
-      className={`flex h-7 w-7 items-center justify-center rounded-full transition-all hover:bg-slate-800 ${
-        optimisticSaved ? 'text-violet-400' : 'text-slate-500 hover:text-slate-300'
-      }`}
+      className="flex h-7 w-7 items-center justify-center rounded-full transition-all hover:bg-[var(--surface-raised)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+      style={optimisticSaved ? { color: accentColor } : undefined}
     >
-      <Bookmark className={`h-4 w-4 transition-all ${optimisticSaved ? 'fill-violet-400' : ''}`} />
+      <Bookmark
+        className="h-4 w-4 transition-all"
+        style={optimisticSaved ? { fill: accentColor, color: accentColor } : undefined}
+      />
     </button>
   )
 }
