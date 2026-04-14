@@ -28,13 +28,13 @@ export default async function AdminUsersPage() {
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-xl font-bold text-white">Users</h1>
         <div className="flex items-center gap-4">
-          <Link href="/admin/communities" className="text-sm text-zinc-400 hover:text-white">
+          <Link href="/admin/communities" className="text-sm text-slate-400 hover:text-white">
             Communities →
           </Link>
-          <Link href="/admin/reports" className="text-sm text-zinc-400 hover:text-white">
+          <Link href="/admin/reports" className="text-sm text-slate-400 hover:text-white">
             Reports →
           </Link>
-          <Link href="/admin/audit-logs" className="text-sm text-zinc-400 hover:text-white">
+          <Link href="/admin/audit-logs" className="text-sm text-slate-400 hover:text-white">
             Audit Log →
           </Link>
         </div>
@@ -42,7 +42,7 @@ export default async function AdminUsersPage() {
 
       <div className="space-y-2">
         {allUsers.map(u => (
-          <div key={u.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3">
+          <div key={u.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-800 bg-[var(--surface)] px-4 py-3">
             <div className="flex items-center gap-3">
               <Link href={`/u/${u.username}`} className="text-sm font-medium text-white hover:underline">
                 {u.username}
@@ -69,8 +69,8 @@ export default async function AdminUsersPage() {
                   type="submit"
                   className={`rounded-lg border px-3 py-1 text-xs transition-colors ${
                     u.is_banned
-                      ? 'border-zinc-700 text-zinc-400 hover:border-green-600 hover:text-green-400'
-                      : 'border-zinc-700 text-zinc-400 hover:border-red-600 hover:text-red-400'
+                      ? 'border-slate-700 text-slate-400 hover:border-green-600 hover:text-green-400'
+                      : 'border-slate-700 text-slate-400 hover:border-red-600 hover:text-red-400'
                   }`}
                 >
                   {u.is_banned ? 'Unban' : 'Ban'}

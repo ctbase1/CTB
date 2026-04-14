@@ -29,43 +29,43 @@ export default async function AdminReportsPage() {
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-xl font-bold text-white">Open Reports</h1>
         <div className="flex items-center gap-4">
-          <Link href="/admin/users" className="text-sm text-zinc-400 hover:text-white">
+          <Link href="/admin/users" className="text-sm text-slate-400 hover:text-white">
             Users →
           </Link>
-          <Link href="/admin/communities" className="text-sm text-zinc-400 hover:text-white">
+          <Link href="/admin/communities" className="text-sm text-slate-400 hover:text-white">
             Communities →
           </Link>
-          <Link href="/admin/audit-logs" className="text-sm text-zinc-400 hover:text-white">
+          <Link href="/admin/audit-logs" className="text-sm text-slate-400 hover:text-white">
             Audit Log →
           </Link>
         </div>
       </div>
 
       {reports.length === 0 ? (
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 py-16 text-center">
-          <p className="text-sm text-zinc-500">No open reports.</p>
+        <div className="rounded-xl border border-slate-800 bg-[var(--surface)] py-16 text-center">
+          <p className="text-sm text-[var(--muted-foreground)]">No open reports.</p>
         </div>
       ) : (
         <div className="space-y-3">
           {reports.map(report => {
             const reporter = report.reporter as { username: string } | null
             return (
-              <div key={report.id} className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+              <div key={report.id} className="rounded-xl border border-slate-800 bg-[var(--surface)] p-4">
                 <div className="mb-2 flex items-start justify-between gap-4">
                   <div className="space-y-1">
-                    <p className="text-xs text-zinc-500">
+                    <p className="text-xs text-[var(--muted-foreground)]">
                       {reporter?.username ? (
-                        <a href={`/u/${reporter.username}`} className="font-medium text-zinc-300 hover:text-violet-400 transition-colors">{reporter.username}</a>
+                        <a href={`/u/${reporter.username}`} className="font-medium text-[var(--foreground)] hover:text-[var(--accent)] transition-colors">{reporter.username}</a>
                       ) : (
-                        <span className="font-medium text-zinc-300">unknown</span>
+                        <span className="font-medium text-[var(--foreground)]">unknown</span>
                       )}
                       {' '}reported a{' '}
-                      <span className="font-medium text-zinc-300">{report.target_type}</span>
+                      <span className="font-medium text-[var(--foreground)]">{report.target_type}</span>
                       {' · '}
                       {new Date(report.created_at).toLocaleDateString()}
                     </p>
-                    <p className="text-sm text-zinc-300">{report.reason}</p>
-                    <p className="font-mono text-xs text-zinc-600">target: {report.target_id}</p>
+                    <p className="text-sm text-[var(--foreground)]">{report.reason}</p>
+                    <p className="font-mono text-xs text-slate-600">target: {report.target_id}</p>
                   </div>
                   <form
                     action={async () => {
@@ -75,7 +75,7 @@ export default async function AdminReportsPage() {
                   >
                     <button
                       type="submit"
-                      className="shrink-0 rounded-lg border border-zinc-700 px-3 py-1 text-xs text-zinc-400 hover:border-green-600 hover:text-green-400"
+                      className="shrink-0 rounded-lg border border-slate-700 px-3 py-1 text-xs text-slate-400 hover:border-green-600 hover:text-green-400"
                     >
                       Resolve
                     </button>
