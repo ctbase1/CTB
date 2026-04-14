@@ -40,7 +40,7 @@ export function FollowButton({
         className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors disabled:opacity-50 ${
           followed
             ? 'border border-zinc-600 text-zinc-300 hover:border-red-500 hover:text-red-400'
-            : 'bg-indigo-600 text-white hover:bg-indigo-500'
+            : 'bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)]'
         }`}
       >
         {followed ? 'Following' : 'Follow'}
