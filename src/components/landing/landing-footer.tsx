@@ -5,7 +5,7 @@ export function LandingFooter() {
     <footer className="border-t border-[var(--border)] bg-[var(--background)] px-4 py-8">
       <div className="mx-auto flex max-w-5xl flex-col items-center gap-4 sm:flex-row sm:justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-base font-bold tracking-tight text-violet-500">CTB</span>
+          <span className="text-base font-bold tracking-tight text-[var(--accent)]">CTB</span>
           <span className="text-xs text-[var(--muted)]">Not financial advice. DYOR.</span>
         </div>
 

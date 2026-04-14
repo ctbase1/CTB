@@ -50,10 +50,10 @@ export function FeaturesSection() {
           {features.map(({ icon: Icon, title, body }) => (
             <div
               key={title}
-              className="group rounded-xl border border-[var(--border)] bg-[var(--background)] p-6 transition-all hover:border-violet-500/40 hover:shadow-glow-violet-sm"
+              className="group rounded-xl border border-[var(--border)] bg-[var(--background)] p-6 transition-all hover:border-blue-500/40 hover:shadow-glow-violet-sm"
             >
-              <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/10">
-                <Icon className="h-5 w-5 text-violet-400" />
+              <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10">
+                <Icon className="h-5 w-5 text-[var(--accent)]" />
               </div>
               <h3 className="mb-2 font-semibold text-[var(--foreground)]">{title}</h3>
               <p className="text-sm leading-relaxed text-[var(--muted-foreground)]">{body}</p>
