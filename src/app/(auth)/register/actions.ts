@@ -2,7 +2,8 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { headers } from 'next/headers'
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ctbase.org'
 
 export async function signUp(formData: FormData) {
   const email    = formData.get('email') as string
@@ -13,7 +14,6 @@ export async function signUp(formData: FormData) {
     redirect('/register?error=' + encodeURIComponent('Username must be 3-20 chars: letters, numbers, underscores only'))
   }
 
-  const origin = headers().get('origin')
   const supabase = createClient()
 
   const { error } = await supabase.auth.signUp({
@@ -21,7 +21,7 @@ export async function signUp(formData: FormData) {
     password,
     options: {
       data: { username },
-      emailRedirectTo: `${origin}/auth/callback?next=/feed`,
+      emailRedirectTo: `${SITE_URL}/auth/callback?next=/feed`,
     },
   })
 
