@@ -83,6 +83,12 @@ export function PostCard({ post, likeCount, commentCount, communitySlug, isSaved
 
           <h3 className="line-clamp-2 text-sm font-semibold text-[var(--foreground)] leading-snug">{post.title}</h3>
 
+          {post.body && (
+            <p className="mt-1 line-clamp-2 text-xs text-[var(--muted-foreground)] leading-relaxed">
+              {post.body}
+            </p>
+          )}
+
           {post.link_preview && (
             <div
               className="mt-2.5 flex items-start gap-3 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-raised)] p-2.5"
