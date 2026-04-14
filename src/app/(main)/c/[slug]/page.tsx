@@ -8,6 +8,16 @@ import { CommunityTabs } from '@/components/community-tabs'
 import { AboutTab } from '@/components/about-tab'
 import { Settings, PenSquare } from 'lucide-react'
 import type { Membership } from '@/types/database'
+import { Suspense } from 'react'
+import { PostCardSkeleton } from '@/components/ui/skeleton'
+
+function PostListSkeleton() {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: 5 }).map((_, i) => <PostCardSkeleton key={i} />)}
+    </div>
+  )
+}
 
 interface Props {
   params: { slug: string }
@@ -244,34 +254,36 @@ export default async function CommunityPage({ params, searchParams }: Props) {
               )}
             </div>
           ) : (
-            <div className="space-y-3">
-              {posts.map(p => (
-                <PostCard
-                  key={p.id}
-                  post={{
-                    ...p,
-                    author: p.author as { username: string } | null,
-                  }}
-                  likeCount={likeCountMap.get(p.id) ?? 0}
-                  commentCount={commentCountMap.get(p.id) ?? 0}
-                  communitySlug={community.slug}
-                  isSaved={savedPostIds.has(p.id)}
-                  initialLiked={likedPostIds.has(p.id)}
-                  userId={user?.id ?? null}
-                  authorFlair={authorFlairMap.get(p.author_id) ?? null}
-                />
-              ))}
-              {posts.length === pageLimit && (
-                <div className="pt-2 text-center">
-                  <Link
-                    href={`?limit=${pageLimit + 20}`}
-                    className="text-sm text-[var(--accent)] hover:underline"
-                  >
-                    Load more
-                  </Link>
-                </div>
-              )}
-            </div>
+            <Suspense fallback={<PostListSkeleton />}>
+              <div className="space-y-3">
+                {posts.map(p => (
+                  <PostCard
+                    key={p.id}
+                    post={{
+                      ...p,
+                      author: p.author as { username: string } | null,
+                    }}
+                    likeCount={likeCountMap.get(p.id) ?? 0}
+                    commentCount={commentCountMap.get(p.id) ?? 0}
+                    communitySlug={community.slug}
+                    isSaved={savedPostIds.has(p.id)}
+                    initialLiked={likedPostIds.has(p.id)}
+                    userId={user?.id ?? null}
+                    authorFlair={authorFlairMap.get(p.author_id) ?? null}
+                  />
+                ))}
+                {posts.length === pageLimit && (
+                  <div className="pt-2 text-center">
+                    <Link
+                      href={`?limit=${pageLimit + 20}`}
+                      className="text-sm text-[var(--accent)] hover:underline"
+                    >
+                      Load more
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </Suspense>
           )}
         </div>
       )}

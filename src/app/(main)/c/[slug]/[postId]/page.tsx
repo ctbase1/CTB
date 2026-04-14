@@ -13,6 +13,16 @@ import { ImageLightbox } from '@/components/ui/image-lightbox'
 import { MarkdownRenderer } from '@/components/markdown-renderer'
 import type { Membership } from '@/types/database'
 import type { CommentData } from '@/components/comment-item'
+import { Suspense } from 'react'
+import { CommentSkeleton } from '@/components/ui/skeleton'
+
+function CommentsSkeleton() {
+  return (
+    <div className="space-y-4 mt-6">
+      {Array.from({ length: 3 }).map((_, i) => <CommentSkeleton key={i} />)}
+    </div>
+  )
+}
 
 interface Props {
   params: { slug: string; postId: string }
@@ -273,14 +283,16 @@ export default async function PostPage({ params }: Props) {
           {enrichedComments.length}{' '}
           {enrichedComments.length === 1 ? 'comment' : 'comments'}
         </p>
-        <CommentThread
-          comments={enrichedComments}
-          postId={post.id}
-          communityId={community.id}
-          communitySlug={community.slug}
-          userId={user?.id ?? null}
-          canMod={canMod}
-        />
+        <Suspense fallback={<CommentsSkeleton />}>
+          <CommentThread
+            comments={enrichedComments}
+            postId={post.id}
+            communityId={community.id}
+            communitySlug={community.slug}
+            userId={user?.id ?? null}
+            canMod={canMod}
+          />
+        </Suspense>
       </div>
     </div>
   )
