@@ -5,6 +5,7 @@ import { MessageSquare, BarChart2, Share2, Check, X as XIcon } from 'lucide-reac
 import { LikeButton } from '@/components/like-button'
 import { BookmarkButton } from '@/components/bookmark-button'
 import { InlineCommentForm } from '@/components/inline-comment-form'
+import type { CommunityColor } from '@/lib/community-colors'
 
 interface PostForActionBar {
   id: string
@@ -20,6 +21,7 @@ interface Props {
   userId?: string | null
   isSaved: boolean
   communitySlug: string
+  communityColor?: CommunityColor
 }
 
 function formatCount(n: number): string {
@@ -36,13 +38,13 @@ export function PostActionBar({
   userId,
   isSaved,
   communitySlug,
+  communityColor,
 }: Props) {
   const [showCommentForm, setShowCommentForm] = useState(false)
   const [shareOpen, setShareOpen]             = useState(false)
   const [copied, setCopied]                   = useState(false)
   const shareRef                              = useRef<HTMLDivElement>(null)
 
-  // Close share dropdown on outside click
   useEffect(() => {
     if (!shareOpen) return
     function onMouseDown(e: MouseEvent) {
@@ -72,9 +74,11 @@ export function PostActionBar({
     setShareOpen(false)
   }
 
+  const accent = communityColor?.accent ?? 'var(--accent)'
+
   return (
     <div onClick={e => e.preventDefault()}>
-      <div className="flex items-center justify-between pt-3 border-t border-slate-700/50">
+      <div className="flex items-center justify-between pt-3 border-t border-[var(--border)]">
         {/* Like */}
         <LikeButton
           targetId={post.id}
@@ -82,23 +86,21 @@ export function PostActionBar({
           initialCount={likeCount}
           initialLiked={initialLiked}
           userId={userId ?? null}
+          accentColor={accent}
         />
 
         {/* Comment */}
         <button
           onClick={() => setShowCommentForm(v => !v)}
-          className={`flex items-center gap-1.5 text-sm transition-all ${
-            showCommentForm
-              ? 'text-violet-400'
-              : 'text-slate-500 hover:text-slate-300'
-          }`}
+          className="flex items-center gap-1.5 text-sm transition-all text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+          style={showCommentForm ? { color: accent } : undefined}
         >
           <MessageSquare className="h-3.5 w-3.5" />
           <span>{commentCount}</span>
         </button>
 
         {/* Views */}
-        <span className="flex items-center gap-1.5 text-sm text-slate-500 cursor-default select-none">
+        <span className="flex items-center gap-1.5 text-sm text-[var(--muted-foreground)] cursor-default select-none">
           <BarChart2 className="h-3.5 w-3.5" />
           <span>{formatCount(post.view_count)}</span>
         </span>
@@ -113,31 +115,28 @@ export function PostActionBar({
           <button
             onClick={() => setShareOpen(v => !v)}
             className={`flex items-center gap-1.5 text-sm transition-all ${
-              copied
-                ? 'text-green-400'
-                : shareOpen
-                  ? 'text-violet-400'
-                  : 'text-slate-500 hover:text-slate-300'
+              copied ? 'text-green-400' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
             }`}
+            style={shareOpen && !copied ? { color: accent } : undefined}
             title="Share"
           >
             {copied ? <Check className="h-3.5 w-3.5" /> : <Share2 className="h-3.5 w-3.5" />}
           </button>
 
           {shareOpen && (
-            <div className="absolute bottom-full right-0 mb-2 z-20 min-w-[140px] rounded-xl border border-slate-700 bg-slate-900 py-1 shadow-xl">
+            <div className="absolute bottom-full right-0 mb-2 z-20 min-w-[140px] rounded-xl border border-[var(--border-strong)] bg-[var(--surface)] py-1 shadow-xl">
               <button
                 onClick={handleCopyLink}
-                className="flex w-full items-center gap-2 px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+                className="flex w-full items-center gap-2 px-3 py-2 text-xs text-[var(--muted-foreground)] hover:bg-[var(--surface-raised)] hover:text-[var(--foreground)] transition-colors"
               >
-                <Check className="h-3.5 w-3.5 text-slate-500" />
+                <Check className="h-3.5 w-3.5 text-[var(--muted-foreground)]" />
                 Copy Link
               </button>
               <button
                 onClick={handleShareToX}
-                className="flex w-full items-center gap-2 px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+                className="flex w-full items-center gap-2 px-3 py-2 text-xs text-[var(--muted-foreground)] hover:bg-[var(--surface-raised)] hover:text-[var(--foreground)] transition-colors"
               >
-                <XIcon className="h-3.5 w-3.5 text-slate-500" />
+                <XIcon className="h-3.5 w-3.5 text-[var(--muted-foreground)]" />
                 Share to X
               </button>
             </div>
@@ -154,7 +153,7 @@ export function PostActionBar({
         />
       )}
       {showCommentForm && !userId && (
-        <p className="mt-3 text-xs text-slate-500">
+        <p className="mt-3 text-xs text-[var(--muted-foreground)]">
           You must be logged in to comment.
         </p>
       )}
