@@ -51,6 +51,27 @@ Audit and replace all hardcoded slate/zinc/white colors with CSS variables acros
 - UI: segmented 3-button control rendered above the community list, using URL-driven state (Link with `?tab=communities&sort=X`)
 - Style: small pill buttons matching the existing tab underline aesthetic
 
+### Banner Aspect Ratio Fix
+- `src/app/(main)/c/[slug]/page.tsx`: the banner currently uses a fixed `h-32 lg:h-44` which causes the community icon/header row (positioned with `-mt-6`) to clip into the image on narrow screens
+- Fix: replace fixed height with `aspect-[3/1]` so the banner scales proportionally. Remove the `-mt-6` negative margin overlap — instead stack the icon row directly below the banner with a small `mt-3` gap and a regular layout flow
+- The community icon moves to sit just below the banner (no overlap), similar to how Twitter/Reddit handle this on mobile. The header row (icon + join button) sits cleanly beneath
+- On desktop (`lg:`): keep `aspect-[4/1]` for a wider, shallower banner
+
+### Members List in About Tab
+- The About tab currently shows description, stats, and rules — no member list
+- Add a **Members** section at the bottom of the About tab
+- Data: fetch all memberships with joined profile usernames and avatars for the community in `c/[slug]/page.tsx`, pass to `AboutTab`
+- Query: `supabase.from('memberships').select('role, user_id, profiles!user_id(username, avatar_url)').eq('community_id', id).order('role')` — roles sort naturally: `admin` < `member` < `moderator` alphabetically, so sort in JS instead
+- Sort order: `admin` first, `moderator` second, `member` last
+- UI layout in `about-tab.tsx`:
+  - Section heading: **"Members"** with total count
+  - Sub-heading row **"Admin"** — avatar + username + `Admin` badge in accent color
+  - Sub-heading row **"Moderators"** (if any) — same treatment, `Mod` badge
+  - Sub-heading row **"Members"** — avatar grid or list, username only
+  - Each member links to `/u/[username]`
+  - Cap display at 50 members total to avoid huge lists; show "View all X members" link if over 50
+- Add `MembersSkeleton` to `skeleton.tsx` for the Suspense fallback
+
 ---
 
 ## Layer 2: Loading Foundation
@@ -195,6 +216,8 @@ const variants = prefersReduced
 | `src/app/(main)/c/[slug]/page.tsx` | Suspense, staggered list |
 | `src/app/(main)/c/[slug]/[postId]/page.tsx` | Suspense comment section |
 | `src/app/(main)/u/[username]/page.tsx` | Suspense posts |
+| `src/app/(main)/c/[slug]/page.tsx` | Banner aspect ratio fix, members list query |
+| `src/components/about-tab.tsx` | Members section (admin/mod/member groups) |
 
 ---
 
