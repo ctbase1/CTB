@@ -39,7 +39,7 @@ export function FollowButton({
         disabled={!currentUserId || isPending}
         className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors disabled:opacity-50 ${
           followed
-            ? 'border border-zinc-600 text-zinc-300 hover:border-red-500 hover:text-red-400'
+            ? 'border border-[var(--border)] text-[var(--muted-foreground)] hover:border-red-500 hover:text-red-400'
             : 'bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)]'
         }`}
       >

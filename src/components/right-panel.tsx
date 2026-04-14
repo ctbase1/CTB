@@ -14,6 +14,7 @@ export async function RightPanel({ userId }: Props) {
   const { data: allMemberships } = await supabase
     .from('memberships')
     .select('community_id')
+    .limit(2000)
 
   const countMap = new Map<string, number>()
   for (const m of allMemberships ?? []) {
@@ -135,7 +136,7 @@ export async function RightPanel({ userId }: Props) {
                       {profile.avatar_url ? (
                         <img src={profile.avatar_url} alt={profile.username} className="h-full w-full object-cover" />
                       ) : (
-                        profile.username[0].toUpperCase()
+                        (profile.username?.[0] ?? '?').toUpperCase()
                       )}
                     </div>
                   </Link>

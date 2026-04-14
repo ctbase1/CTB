@@ -15,7 +15,8 @@ const TABS = [
 ]
 
 export default async function FeedPage({ searchParams }: Props) {
-  const pageLimit = Math.min(Math.max(Number(searchParams.limit ?? 20), 20), 100)
+  const rawLimit = parseInt(searchParams.limit ?? '', 10)
+  const pageLimit = Math.min(Math.max(isNaN(rawLimit) ? 20 : rawLimit, 20), 100)
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 

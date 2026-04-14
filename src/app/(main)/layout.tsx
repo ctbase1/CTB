@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { Sidebar } from '@/components/sidebar'
 import { MobileHeader } from '@/components/mobile-header'
@@ -43,7 +44,9 @@ export default async function MainLayout({ children }: { children: React.ReactNo
           </main>
 
           {/* Right panel — xl+ only, sticky */}
-          <RightPanel userId={user.id} />
+          <Suspense fallback={null}>
+            <RightPanel userId={user.id} />
+          </Suspense>
         </div>
 
         {/* Desktop footer */}
