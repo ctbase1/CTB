@@ -133,7 +133,7 @@ export default async function CommunityPage({ params, searchParams }: Props) {
   return (
     <div className="min-w-0">
       {/* Banner hero */}
-      <div className="relative mb-0 h-32 w-full overflow-hidden rounded-2xl lg:h-44">
+      <div className="relative w-full overflow-hidden rounded-2xl aspect-[3/1] lg:aspect-[4/1]">
         {community.banner_url ? (
           <Image src={community.banner_url} alt={community.name} fill className="object-cover" />
         ) : (
@@ -142,8 +142,8 @@ export default async function CommunityPage({ params, searchParams }: Props) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
       </div>
 
-      {/* Header — overlaps banner */}
-      <div className="flex items-end justify-between gap-4 -mt-6 px-1">
+      {/* Header — sits below banner, no overlap */}
+      <div className="flex items-center justify-between gap-4 mt-3 px-1">
         <div>
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-[var(--background)] bg-gradient-to-br from-blue-600 to-blue-900 text-xl font-bold text-white shadow-lg">
             {community.name[0].toUpperCase()}
