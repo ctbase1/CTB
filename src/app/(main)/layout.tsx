@@ -33,11 +33,11 @@ export default async function MainLayout({ children }: { children: React.ReactNo
       {/* Content column — offset by sidebar width on md+ */}
       <div className="flex flex-col min-h-screen md:ml-16 lg:ml-64">
         {/* Mobile header */}
-        <MobileHeader />
+        <MobileHeader profile={profile} />
 
         {/* Main content row (feed + right panel) */}
         <div className="flex flex-1">
-          <main className="flex-1 min-w-0 py-6 px-4 pb-24 md:pb-6">
+          <main className="flex-1 min-w-0 py-6 px-4 pb-24 md:pb-6" style={{ overscrollBehaviorY: 'contain' }}>
             <div className="mx-auto w-full max-w-2xl">
               {children}
             </div>
