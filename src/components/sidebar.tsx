@@ -28,9 +28,9 @@ export function Sidebar({ profile, unreadCount }: SidebarProps) {
   }
 
   const linkClass = (href: string) =>
-    `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+    `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
       isActive(href)
-        ? 'bg-[var(--surface-raised)] text-[var(--accent)]'
+        ? 'border-l-2 border-[var(--accent)] pl-[calc(0.75rem-2px)] text-[var(--accent)]'
         : 'text-[var(--muted-foreground)] hover:bg-[var(--surface-raised)] hover:text-[var(--foreground)]'
     }`
 
