@@ -105,14 +105,14 @@ export function Sidebar({ profile, unreadCount }: SidebarProps) {
           <span className="hidden lg:inline">Settings</span>
         </Link>
 
-        <div className="flex items-center gap-3 rounded-xl px-3 py-2.5">
+        <div className="flex items-center gap-3 rounded-lg px-3 py-2.5">
           <ThemeToggle />
           <span className="hidden lg:inline text-sm text-[var(--muted-foreground)]">Theme</span>
         </div>
 
         <button
           onClick={handleSignOut}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[var(--muted-foreground)] hover:bg-[var(--surface-raised)] hover:text-red-400 transition-colors"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--muted-foreground)] hover:bg-[var(--surface-raised)] hover:text-red-400 transition-colors"
           title="Sign out"
         >
           <LogOut className="h-5 w-5 shrink-0" />
