@@ -19,9 +19,9 @@ const config: Config = {
         "muted-foreground": "var(--muted-foreground)",
       },
       boxShadow: {
-        "glow-violet": "0 0 20px rgba(139, 92, 246, 0.15)",
-        "glow-violet-sm": "0 0 12px rgba(139, 92, 246, 0.10)",
-        "glow-violet-md": "0 0 30px rgba(139, 92, 246, 0.20)",
+        "glow-blue":    "0 0 20px rgba(59, 130, 246, 0.15)",
+        "glow-blue-sm": "0 0 12px rgba(59, 130, 246, 0.10)",
+        "glow-blue-md": "0 0 30px rgba(59, 130, 246, 0.20)",
       },
       keyframes: {
         shimmer: {
