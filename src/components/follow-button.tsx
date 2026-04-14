@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { toggleFollow } from '@/lib/actions/follow'
+import { motion, useReducedMotion } from '@/components/motion'
 
 interface Props {
   targetUserId: string
@@ -9,14 +10,11 @@ interface Props {
   currentUserId: string | null
 }
 
-export function FollowButton({
-  targetUserId,
-  initialFollowed,
-  currentUserId,
-}: Props) {
+export function FollowButton({ targetUserId, initialFollowed, currentUserId }: Props) {
   const [followed, setFollowed] = useState(initialFollowed)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const reduced = useReducedMotion()
 
   function handleClick() {
     if (!currentUserId) return
@@ -34,9 +32,10 @@ export function FollowButton({
 
   return (
     <div className="flex flex-col items-center gap-1">
-      <button
+      <motion.button
         onClick={handleClick}
         disabled={!currentUserId || isPending}
+        whileTap={reduced ? {} : { scale: 0.95 }}
         className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors disabled:opacity-50 ${
           followed
             ? 'border border-[var(--border)] text-[var(--muted-foreground)] hover:border-red-500 hover:text-red-400'
@@ -44,7 +43,7 @@ export function FollowButton({
         }`}
       >
         {followed ? 'Following' : 'Follow'}
-      </button>
+      </motion.button>
       {error && <span className="text-xs text-red-400">{error}</span>}
     </div>
   )
