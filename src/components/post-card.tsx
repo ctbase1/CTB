@@ -56,9 +56,9 @@ export function PostCard({ post, likeCount, commentCount, communitySlug, isSaved
       )}
 
       {/* Main clickable area */}
-      <Link href={`/c/${communitySlug}/${post.id}`} className="flex gap-4 px-5 pt-4 pb-2">
+      <Link href={`/c/${communitySlug}/${post.id}`} className="flex gap-4 px-3 pt-3 pb-2 md:px-5 md:pt-4">
         {post.image_url && (
-          <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-[var(--surface-raised)]">
+          <div className="relative h-14 w-14 md:h-16 md:w-16 shrink-0 overflow-hidden rounded-xl bg-[var(--surface-raised)]">
             <Image src={post.image_url} alt={post.title} fill className="object-cover" />
           </div>
         )}
@@ -82,6 +82,12 @@ export function PostCard({ post, likeCount, commentCount, communitySlug, isSaved
           </div>
 
           <h3 className="line-clamp-2 text-sm font-semibold text-[var(--foreground)] leading-snug">{post.title}</h3>
+
+          {post.body && (
+            <p className="mt-1 line-clamp-2 text-xs text-[var(--muted-foreground)] leading-relaxed">
+              {post.body}
+            </p>
+          )}
 
           {post.link_preview && (
             <div
@@ -114,7 +120,7 @@ export function PostCard({ post, likeCount, commentCount, communitySlug, isSaved
       </Link>
 
       {/* Byline */}
-      <div className="flex items-center gap-1.5 px-5 pb-2 text-xs text-[var(--muted-foreground)]">
+      <div className="flex items-center gap-1.5 px-3 pb-2 md:px-5 text-xs text-[var(--muted-foreground)]">
         <span>by</span>
         {authorUsername ? (
           <Link
@@ -140,7 +146,7 @@ export function PostCard({ post, likeCount, commentCount, communitySlug, isSaved
       </div>
 
       {/* Action bar */}
-      <div className="px-5 pb-4">
+      <div className="px-3 pb-3 md:px-5 md:pb-4">
         <PostActionBar
           post={post}
           likeCount={likeCount}

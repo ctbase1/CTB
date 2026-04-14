@@ -8,6 +8,18 @@ import { CommunityTabs } from '@/components/community-tabs'
 import { AboutTab } from '@/components/about-tab'
 import { Settings, PenSquare } from 'lucide-react'
 import type { Membership } from '@/types/database'
+import { Suspense } from 'react'
+import { PostCardSkeleton } from '@/components/ui/skeleton'
+import { StaggeredList } from '@/components/staggered-list'
+import { FadeIn } from '@/components/page-transition'
+
+function PostListSkeleton() {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: 5 }).map((_, i) => <PostCardSkeleton key={i} />)}
+    </div>
+  )
+}
 
 interface Props {
   params: { slug: string }
@@ -49,6 +61,20 @@ export default async function CommunityPage({ params, searchParams }: Props) {
       userFlair = data.flair ?? null
     }
   }
+
+  // Fetch members with profiles for About tab
+  const { data: membersRaw } = await supabase
+    .from('memberships')
+    .select('role, user_id, profiles!user_id(username, avatar_url)')
+    .eq('community_id', community.id)
+    .limit(50)
+
+  type MemberRow = { role: string; user_id: string; profiles: { username: string; avatar_url: string | null } | null }
+  const members: MemberRow[] = (membersRaw ?? []) as MemberRow[]
+
+  // Sort: admin first, moderator second, member last
+  const roleOrder: Record<string, number> = { admin: 0, moderator: 1, member: 2 }
+  members.sort((a, b) => (roleOrder[a.role] ?? 3) - (roleOrder[b.role] ?? 3))
 
   // Fetch posts with author — pinned first, then by created_at desc
   const { data: rawPosts } = await supabase
@@ -133,7 +159,7 @@ export default async function CommunityPage({ params, searchParams }: Props) {
   return (
     <div className="min-w-0">
       {/* Banner hero */}
-      <div className="relative mb-0 h-32 w-full overflow-hidden rounded-2xl lg:h-44">
+      <div className="relative w-full overflow-hidden rounded-2xl aspect-[3/1] lg:aspect-[4/1]">
         {community.banner_url ? (
           <Image src={community.banner_url} alt={community.name} fill className="object-cover" />
         ) : (
@@ -142,8 +168,8 @@ export default async function CommunityPage({ params, searchParams }: Props) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
       </div>
 
-      {/* Header — overlaps banner */}
-      <div className="flex items-end justify-between gap-4 -mt-6 px-1">
+      {/* Header — sits below banner, no overlap */}
+      <div className="flex items-center justify-between gap-4 mt-3 px-1">
         <div>
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-[var(--background)] bg-gradient-to-br from-blue-600 to-blue-900 text-xl font-bold text-white shadow-lg">
             {community.name[0].toUpperCase()}
@@ -196,6 +222,7 @@ export default async function CommunityPage({ params, searchParams }: Props) {
           userId={user?.id ?? null}
           userFlair={userFlair}
           isMember={!!membership}
+          members={members}
         />
       ) : (
         <div className="mt-6">
@@ -229,34 +256,38 @@ export default async function CommunityPage({ params, searchParams }: Props) {
               )}
             </div>
           ) : (
-            <div className="space-y-3">
-              {posts.map(p => (
-                <PostCard
-                  key={p.id}
-                  post={{
-                    ...p,
-                    author: p.author as { username: string } | null,
-                  }}
-                  likeCount={likeCountMap.get(p.id) ?? 0}
-                  commentCount={commentCountMap.get(p.id) ?? 0}
-                  communitySlug={community.slug}
-                  isSaved={savedPostIds.has(p.id)}
-                  initialLiked={likedPostIds.has(p.id)}
-                  userId={user?.id ?? null}
-                  authorFlair={authorFlairMap.get(p.author_id) ?? null}
-                />
-              ))}
-              {posts.length === pageLimit && (
-                <div className="pt-2 text-center">
-                  <Link
-                    href={`?limit=${pageLimit + 20}`}
-                    className="text-sm text-[var(--accent)] hover:underline"
-                  >
-                    Load more
-                  </Link>
-                </div>
-              )}
-            </div>
+            <Suspense fallback={<PostListSkeleton />}>
+              <FadeIn>
+                <StaggeredList className="space-y-3">
+                  {posts.map(p => (
+                    <PostCard
+                      key={p.id}
+                      post={{
+                        ...p,
+                        author: p.author as { username: string } | null,
+                      }}
+                      likeCount={likeCountMap.get(p.id) ?? 0}
+                      commentCount={commentCountMap.get(p.id) ?? 0}
+                      communitySlug={community.slug}
+                      isSaved={savedPostIds.has(p.id)}
+                      initialLiked={likedPostIds.has(p.id)}
+                      userId={user?.id ?? null}
+                      authorFlair={authorFlairMap.get(p.author_id) ?? null}
+                    />
+                  ))}
+                </StaggeredList>
+                {posts.length === pageLimit && (
+                  <div className="pt-2 text-center">
+                    <Link
+                      href={`?limit=${pageLimit + 20}`}
+                      className="text-sm text-[var(--accent)] hover:underline"
+                    >
+                      Load more
+                    </Link>
+                  </div>
+                )}
+              </FadeIn>
+            </Suspense>
           )}
         </div>
       )}

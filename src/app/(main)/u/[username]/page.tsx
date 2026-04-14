@@ -3,8 +3,17 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import { FollowButton } from '@/components/follow-button'
 import { PostCard } from '@/components/post-card'
-
 import Link from 'next/link'
+import { Suspense } from 'react'
+import { PostCardSkeleton } from '@/components/ui/skeleton'
+
+function PostListSkeleton() {
+  return (
+    <div className="space-y-3 mt-6">
+      {Array.from({ length: 3 }).map((_, i) => <PostCardSkeleton key={i} />)}
+    </div>
+  )
+}
 
 interface Props {
   params: { username: string }
@@ -158,33 +167,35 @@ export default async function ProfilePage({ params, searchParams }: Props) {
             <p className="text-sm text-zinc-500">No posts yet.</p>
           </div>
         ) : (
-          <div className="space-y-2">
-            {posts.map(p => {
-              const community = p.community as { slug: string } | null
-              if (!community) return null
-              return (
-                <PostCard
-                  key={p.id}
-                  post={{
-                    ...p,
-                    author: p.author as { username: string } | null,
-                  }}
-                  likeCount={likeCountMap.get(p.id) ?? 0}
-                  commentCount={commentCountMap.get(p.id) ?? 0}
-                  communitySlug={community.slug}
-                  isSaved={savedPostIds.has(p.id)}
-                  userId={user?.id ?? null}
-                />
-              )
-            })}
-            {posts.length === pageLimit && (
-              <div className="pt-2 text-center">
-                <Link href={`?limit=${pageLimit + 20}`} className="text-sm text-violet-400 hover:underline">
-                  Load more
-                </Link>
-              </div>
-            )}
-          </div>
+          <Suspense fallback={<PostListSkeleton />}>
+            <div className="space-y-2">
+              {posts.map(p => {
+                const community = p.community as { slug: string } | null
+                if (!community) return null
+                return (
+                  <PostCard
+                    key={p.id}
+                    post={{
+                      ...p,
+                      author: p.author as { username: string } | null,
+                    }}
+                    likeCount={likeCountMap.get(p.id) ?? 0}
+                    commentCount={commentCountMap.get(p.id) ?? 0}
+                    communitySlug={community.slug}
+                    isSaved={savedPostIds.has(p.id)}
+                    userId={user?.id ?? null}
+                  />
+                )
+              })}
+              {posts.length === pageLimit && (
+                <div className="pt-2 text-center">
+                  <Link href={`?limit=${pageLimit + 20}`} className="text-sm text-violet-400 hover:underline">
+                    Load more
+                  </Link>
+                </div>
+              )}
+            </div>
+          </Suspense>
         )}
       </div>
     </div>

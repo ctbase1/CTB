@@ -34,7 +34,7 @@ export function InlineCommentForm({ postId, communitySlug, onClose }: Props) {
   }
 
   return (
-    <form ref={formRef} action={handleSubmit} className="mt-3 space-y-2">
+    <form ref={formRef} action={handleSubmit} className="mt-3 space-y-2" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <input type="hidden" name="post_id"        value={postId} />
       <input type="hidden" name="parent_id"      value="" />
       <input type="hidden" name="community_slug" value={communitySlug} />
@@ -45,6 +45,8 @@ export function InlineCommentForm({ postId, communitySlug, onClose }: Props) {
         maxLength={COMMENT_MAX}
         placeholder="Write a comment…"
         onChange={e => setCharCount(e.target.value.length)}
+        inputMode="text"
+        autoComplete="off"
         className="w-full resize-none rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all"
       />
       {error && <p className="text-xs text-red-400">{error}</p>}

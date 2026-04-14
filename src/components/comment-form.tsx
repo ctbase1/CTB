@@ -41,7 +41,7 @@ export function CommentForm({ postId, parentId, communitySlug, onSuccess }: Prop
       <input type="hidden" name="post_id"        value={postId} />
       <input type="hidden" name="parent_id"      value={parentId ?? ''} />
       <input type="hidden" name="community_slug" value={communitySlug} />
-      <div className="rounded-xl border border-slate-700 bg-slate-800 px-3 pt-2.5 pb-2 focus-within:border-violet-500 focus-within:ring-2 focus-within:ring-violet-500/20 transition-all">
+      <div className="rounded-xl border border-slate-700 bg-slate-800 px-3 pt-2.5 pb-2 focus-within:border-violet-500 focus-within:ring-2 focus-within:ring-violet-500/20 transition-all" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <MarkdownToolbar textareaRef={textareaRef} onUpdate={v => setCharCount(v.length)} />
         <textarea
           ref={textareaRef}
@@ -51,6 +51,8 @@ export function CommentForm({ postId, parentId, communitySlug, onSuccess }: Prop
           maxLength={COMMENT_MAX}
           placeholder={parentId ? 'Write a reply…' : 'Write a comment…'}
           onChange={e => setCharCount(e.target.value.length)}
+          inputMode="text"
+          autoComplete="off"
           className="w-full resize-none bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none"
         />
       </div>
