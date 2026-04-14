@@ -19,6 +19,7 @@ const PALETTE: CommunityColor[] = [
 ]
 
 export function getCommunityColor(slug: string): CommunityColor {
+  if (!slug) return PALETTE[0]
   const hash = slug.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0)
   return PALETTE[hash % PALETTE.length]
 }
