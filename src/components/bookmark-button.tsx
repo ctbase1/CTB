@@ -3,7 +3,7 @@
 import { useOptimistic, useTransition } from 'react'
 import { toggleSaved } from '@/lib/actions/saved'
 import { Bookmark } from 'lucide-react'
-import { motion, useReducedMotion } from '@/components/motion'
+import { motion, useReducedMotion } from 'framer-motion'
 
 interface Props {
   postId: string

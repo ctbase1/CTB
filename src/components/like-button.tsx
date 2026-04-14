@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { toggleLike } from '@/lib/actions/like'
 import { Heart } from 'lucide-react'
-import { motion, useReducedMotion } from '@/components/motion'
+import { motion, useReducedMotion } from 'framer-motion'
 
 interface Props {
   targetId: string

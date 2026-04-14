@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { toggleFollow } from '@/lib/actions/follow'
-import { motion, useReducedMotion } from '@/components/motion'
+import { motion, useReducedMotion } from 'framer-motion'
 
 interface Props {
   targetUserId: string

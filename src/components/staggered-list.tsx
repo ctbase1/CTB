@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useReducedMotion } from '@/components/motion'
+import { motion, useReducedMotion } from 'framer-motion'
 
 const containerVariants = {
   hidden: {},
