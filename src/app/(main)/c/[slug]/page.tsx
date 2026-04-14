@@ -50,6 +50,20 @@ export default async function CommunityPage({ params, searchParams }: Props) {
     }
   }
 
+  // Fetch members with profiles for About tab
+  const { data: membersRaw } = await supabase
+    .from('memberships')
+    .select('role, user_id, profiles!user_id(username, avatar_url)')
+    .eq('community_id', community.id)
+    .limit(50)
+
+  type MemberRow = { role: string; user_id: string; profiles: { username: string; avatar_url: string | null } | null }
+  const members: MemberRow[] = (membersRaw ?? []) as MemberRow[]
+
+  // Sort: admin first, moderator second, member last
+  const roleOrder: Record<string, number> = { admin: 0, moderator: 1, member: 2 }
+  members.sort((a, b) => (roleOrder[a.role] ?? 3) - (roleOrder[b.role] ?? 3))
+
   // Fetch posts with author — pinned first, then by created_at desc
   const { data: rawPosts } = await supabase
     .from('posts')
@@ -196,6 +210,7 @@ export default async function CommunityPage({ params, searchParams }: Props) {
           userId={user?.id ?? null}
           userFlair={userFlair}
           isMember={!!membership}
+          members={members}
         />
       ) : (
         <div className="mt-6">
