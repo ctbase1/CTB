@@ -11,14 +11,14 @@ export default function RegisterPage({ searchParams }: Props) {
   if (searchParams.verify === '1') {
     const email = searchParams.email ? decodeURIComponent(searchParams.email) : ''
     return (
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-900 p-8 shadow-glow-violet-sm text-center">
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center">
         <div className="mb-4 text-4xl">📬</div>
-        <h2 className="mb-2 text-xl font-semibold text-white">Check your email</h2>
-        <p className="mb-1 text-sm text-slate-400">
+        <h2 className="mb-2 text-xl font-semibold text-[var(--foreground)]">Check your email</h2>
+        <p className="mb-1 text-sm text-[var(--muted-foreground)]">
           We sent a confirmation link to
         </p>
-        <p className="mb-6 text-sm font-medium text-violet-400 break-all">{email}</p>
-        <p className="mb-6 text-sm text-slate-400">
+        <p className="mb-6 text-sm font-medium text-[var(--accent)] break-all">{email}</p>
+        <p className="mb-6 text-sm text-[var(--muted-foreground)]">
           Click the link in the email to activate your account. Check your spam folder if you don&apos;t see it.
         </p>
 
@@ -35,9 +35,9 @@ export default function RegisterPage({ searchParams }: Props) {
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-slate-400">
+        <p className="mt-6 text-center text-sm text-[var(--muted-foreground)]">
           Wrong email?{' '}
-          <Link href="/register" className="text-violet-400 hover:underline">
+          <Link href="/register" className="text-[var(--accent)] hover:underline">
             Start over
           </Link>
         </p>
@@ -46,8 +46,8 @@ export default function RegisterPage({ searchParams }: Props) {
   }
 
   return (
-    <div className="rounded-2xl border border-slate-700/50 bg-slate-900 p-8 shadow-glow-violet-sm">
-      <h2 className="mb-6 text-xl font-semibold text-white">Create account</h2>
+    <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8">
+      <h2 className="mb-6 text-xl font-semibold text-[var(--foreground)]">Create account</h2>
 
       {searchParams.error && (
         <p className="mb-4 rounded-xl border border-red-900/50 bg-red-950/30 px-4 py-2 text-sm text-red-400">
@@ -69,9 +69,9 @@ export default function RegisterPage({ searchParams }: Props) {
         <Button type="submit" className="w-full mt-1">Create account</Button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-slate-400">
+      <p className="mt-6 text-center text-sm text-[var(--muted-foreground)]">
         Have an account?{' '}
-        <Link href="/login" className="text-violet-400 hover:underline">
+        <Link href="/login" className="text-[var(--accent)] hover:underline">
           Sign in
         </Link>
       </p>
