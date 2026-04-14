@@ -38,8 +38,8 @@ const milestones: { title: string; description: string; status: Status }[] = [
 const statusConfig: Record<Status, { label: string; dotClass: string; labelClass: string; icon: typeof CheckCircle2 }> = {
   live: {
     label: 'Live',
-    dotClass: 'bg-violet-500 shadow-glow-violet-sm',
-    labelClass: 'bg-violet-500/15 text-violet-400 border border-violet-500/30',
+    dotClass: 'bg-[var(--accent)] shadow-glow-violet-sm',
+    labelClass: 'bg-blue-500/15 text-[var(--accent)] border border-blue-500/30',
     icon: CheckCircle2,
   },
   'in-progress': {
@@ -50,7 +50,7 @@ const statusConfig: Record<Status, { label: string; dotClass: string; labelClass
   },
   planned: {
     label: 'Planned',
-    dotClass: 'bg-slate-600',
+    dotClass: 'bg-[var(--muted-foreground)]',
     labelClass: 'bg-[var(--surface-raised)] text-[var(--muted-foreground)] border border-[var(--border)]',
     icon: Circle,
   },

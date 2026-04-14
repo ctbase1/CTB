@@ -8,10 +8,10 @@ export async function LandingNavbar() {
 
   return (
     <nav className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--background)]/80 backdrop-blur-md px-4 py-3">
-      <div className="mx-auto flex max-w-5xl items-center gap-4">
+      <div className="mx-auto flex max-w-5xl items-center gap-3">
         <Link
           href="/"
-          className="shrink-0 text-lg font-bold tracking-tight text-violet-500 hover:text-violet-400 transition-colors"
+          className="shrink-0 text-lg font-bold tracking-tight text-[var(--accent)] hover:opacity-80 transition-opacity"
         >
           CTB
         </Link>
@@ -23,7 +23,7 @@ export async function LandingNavbar() {
         {user ? (
           <Link
             href="/feed"
-            className="rounded-lg bg-violet-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-violet-500"
+            className="rounded-lg bg-[var(--accent)] px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-hover)]"
           >
             Go to Feed
           </Link>
@@ -31,13 +31,13 @@ export async function LandingNavbar() {
           <div className="flex items-center gap-2">
             <Link
               href="/login"
-              className="hidden rounded-lg px-4 py-1.5 text-sm font-medium text-[var(--muted-foreground)] transition-colors hover:text-[var(--foreground)] sm:block"
+              className="rounded-lg px-3 py-1.5 text-sm font-medium text-[var(--muted-foreground)] transition-colors hover:text-[var(--foreground)]"
             >
               Sign In
             </Link>
             <Link
               href="/register"
-              className="rounded-lg bg-violet-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-violet-500 sm:px-4"
+              className="rounded-lg bg-[var(--accent)] px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-hover)]"
             >
               Join CTB
             </Link>

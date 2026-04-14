@@ -39,13 +39,13 @@ export default async function AdminCommunitiesPage() {
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-xl font-bold text-white">Communities</h1>
         <div className="flex items-center gap-4">
-          <Link href="/admin/users" className="text-sm text-zinc-400 hover:text-white">
+          <Link href="/admin/users" className="text-sm text-slate-400 hover:text-white">
             Users →
           </Link>
-          <Link href="/admin/reports" className="text-sm text-zinc-400 hover:text-white">
+          <Link href="/admin/reports" className="text-sm text-slate-400 hover:text-white">
             Reports →
           </Link>
-          <Link href="/admin/audit-logs" className="text-sm text-zinc-400 hover:text-white">
+          <Link href="/admin/audit-logs" className="text-sm text-slate-400 hover:text-white">
             Audit Log →
           </Link>
         </div>
@@ -57,7 +57,7 @@ export default async function AdminCommunitiesPage() {
           return (
             <div
               key={c.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3"
+              className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-800 bg-[var(--surface)] px-4 py-3"
             >
               <div className="flex flex-col gap-0.5">
                 <div className="flex items-center gap-2">
@@ -70,10 +70,10 @@ export default async function AdminCommunitiesPage() {
                     <span className="rounded bg-green-900/40 px-1.5 py-0.5 text-xs text-green-400">active</span>
                   )}
                 </div>
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-[var(--muted-foreground)]">
                   by{' '}
                   {creator?.username
-                    ? <a href={`/u/${creator.username}`} className="hover:text-violet-400 transition-colors">{creator.username}</a>
+                    ? <a href={`/u/${creator.username}`} className="hover:text-[var(--accent)] transition-colors">{creator.username}</a>
                     : 'unknown'
                   }
                   {' '}&middot; {countMap.get(c.id) ?? 0} members &middot; {new Date(c.created_at).toLocaleDateString()}
@@ -90,8 +90,8 @@ export default async function AdminCommunitiesPage() {
                   type="submit"
                   className={`rounded-lg border px-3 py-1 text-xs transition-colors ${
                     c.is_removed
-                      ? 'border-zinc-700 text-zinc-400 hover:border-green-600 hover:text-green-400'
-                      : 'border-zinc-700 text-zinc-400 hover:border-red-600 hover:text-red-400'
+                      ? 'border-slate-700 text-slate-400 hover:border-green-600 hover:text-green-400'
+                      : 'border-slate-700 text-slate-400 hover:border-red-600 hover:text-red-400'
                   }`}
                 >
                   {c.is_removed ? 'Restore' : 'Remove'}
@@ -102,7 +102,7 @@ export default async function AdminCommunitiesPage() {
         })}
 
         {rows.length === 0 && (
-          <p className="py-8 text-center text-sm text-zinc-500">No communities yet.</p>
+          <p className="py-8 text-center text-sm text-[var(--muted-foreground)]">No communities yet.</p>
         )}
       </div>
     </div>

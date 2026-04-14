@@ -3,29 +3,29 @@
 @tailwind utilities;
 
 :root {
-  --background: #0f0f17;
-  --foreground: #e2e8f0;
-  --surface: #161622;
-  --surface-raised: #1e1e2e;
-  --border: rgba(148, 163, 184, 0.12);
-  --border-strong: rgba(148, 163, 184, 0.20);
-  --muted: #475569;
+  --background: #080e1a;
+  --foreground: #e2e8f4;
+  --surface: #0d1526;
+  --surface-raised: #132040;
+  --border: rgba(96, 165, 250, 0.12);
+  --border-strong: rgba(96, 165, 250, 0.20);
+  --muted: #334155;
   --muted-foreground: #94a3b8;
-  --accent: #8b5cf6;
-  --accent-hover: #7c3aed;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
 }
 
 html.light {
-  --background: #fafafa;
-  --foreground: #0f0f17;
+  --background: #f0f4ff;
+  --foreground: #0a0f1e;
   --surface: #ffffff;
-  --surface-raised: #f4f4f5;
-  --border: rgba(15, 15, 23, 0.10);
-  --border-strong: rgba(15, 15, 23, 0.18);
-  --muted: #71717a;
-  --muted-foreground: #52525b;
-  --accent: #7c3aed;
-  --accent-hover: #6d28d9;
+  --surface-raised: #e8eeff;
+  --border: rgba(37, 99, 235, 0.10);
+  --border-strong: rgba(37, 99, 235, 0.18);
+  --muted: #64748b;
+  --muted-foreground: #475569;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
 }
 
 body {
@@ -41,13 +41,13 @@ body {
 
   .bg-hero-glow {
     background:
-      radial-gradient(ellipse at top, rgba(139, 92, 246, 0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at top, rgba(59, 130, 246, 0.08) 0%, transparent 60%),
       var(--background);
   }
 
   html.light .bg-hero-glow {
     background:
-      radial-gradient(ellipse at top, rgba(124, 58, 237, 0.04) 0%, transparent 60%),
+      radial-gradient(ellipse at top, rgba(37, 99, 235, 0.04) 0%, transparent 60%),
       var(--background);
   }
 

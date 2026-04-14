@@ -40,21 +40,21 @@ export default async function AuditLogsPage() {
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-xl font-bold text-white">Audit Log</h1>
         <div className="flex items-center gap-4">
-          <Link href="/admin/users" className="text-sm text-zinc-400 hover:text-white">
+          <Link href="/admin/users" className="text-sm text-slate-400 hover:text-white">
             Users →
           </Link>
-          <Link href="/admin/reports" className="text-sm text-zinc-400 hover:text-white">
+          <Link href="/admin/reports" className="text-sm text-slate-400 hover:text-white">
             Reports →
           </Link>
-          <Link href="/admin/communities" className="text-sm text-zinc-400 hover:text-white">
+          <Link href="/admin/communities" className="text-sm text-slate-400 hover:text-white">
             Communities →
           </Link>
         </div>
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 py-16 text-center">
-          <p className="text-sm text-zinc-500">No audit log entries yet.</p>
+        <div className="rounded-xl border border-slate-800 bg-[var(--surface)] py-16 text-center">
+          <p className="text-sm text-[var(--muted-foreground)]">No audit log entries yet.</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -63,18 +63,18 @@ export default async function AuditLogsPage() {
             return (
               <div
                 key={log.id}
-                className="flex flex-wrap items-start justify-between gap-3 rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3"
+                className="flex flex-wrap items-start justify-between gap-3 rounded-xl border border-slate-800 bg-[var(--surface)] px-4 py-3"
               >
                 <div className="space-y-1">
                   <p className="text-sm text-white">
                     {ACTION_LABELS[log.action] ?? log.action}
                   </p>
-                  <p className="text-xs text-zinc-500">
+                  <p className="text-xs text-[var(--muted-foreground)]">
                     by{' '}
                     {actor?.username ? (
-                      <a href={`/u/${actor.username}`} className="font-medium text-zinc-300 hover:text-violet-400 transition-colors">{actor.username}</a>
+                      <a href={`/u/${actor.username}`} className="font-medium text-slate-300 hover:text-[var(--accent)] transition-colors">{actor.username}</a>
                     ) : (
-                      <span className="font-medium text-zinc-300">unknown</span>
+                      <span className="font-medium text-slate-300">unknown</span>
                     )}
                     {log.target_type && (
                       <>
@@ -85,12 +85,12 @@ export default async function AuditLogsPage() {
                     {log.target_id && (
                       <>
                         {' · '}
-                        <span className="font-mono text-zinc-600">{log.target_id.slice(0, 8)}&hellip;</span>
+                        <span className="font-mono text-slate-600">{log.target_id.slice(0, 8)}&hellip;</span>
                       </>
                     )}
                   </p>
                 </div>
-                <p className="shrink-0 text-xs text-zinc-600">
+                <p className="shrink-0 text-xs text-slate-600">
                   {new Date(log.created_at).toLocaleString()}
                 </p>
               </div>
