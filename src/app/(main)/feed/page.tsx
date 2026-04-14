@@ -5,7 +5,7 @@ import { PostCard } from '@/components/post-card'
 import type { Membership } from '@/types/database'
 
 interface Props {
-  searchParams: { tab?: string; limit?: string }
+  searchParams: { tab?: string; limit?: string; sort?: string }
 }
 
 const TABS = [
@@ -89,12 +89,20 @@ export default async function FeedPage({ searchParams }: Props) {
     posts = (rawPosts ?? []) as FeedPost[]
   } else {
     // communities tab
-    const { data: communities } = await supabase
+    const sort = (searchParams.sort ?? 'newest') as 'newest' | 'members' | 'alpha'
+
+    const communitiesQuery = supabase
       .from('communities')
       .select('*')
       .eq('is_removed', false)
-      .order('created_at', { ascending: false })
 
+    if (sort === 'alpha') {
+      communitiesQuery.order('name', { ascending: true })
+    } else {
+      communitiesQuery.order('created_at', { ascending: false })
+    }
+
+    const { data: communities } = await communitiesQuery
     allCommunities = (communities ?? []) as CommunityRow[]
 
     if (allCommunities.length > 0) {
@@ -104,6 +112,12 @@ export default async function FeedPage({ searchParams }: Props) {
 
       for (const m of allMemberships ?? []) {
         communityMemberCountMap.set(m.community_id, (communityMemberCountMap.get(m.community_id) ?? 0) + 1)
+      }
+
+      if (sort === 'members') {
+        allCommunities.sort((a, b) =>
+          (communityMemberCountMap.get(b.id) ?? 0) - (communityMemberCountMap.get(a.id) ?? 0)
+        )
       }
     }
   }
@@ -239,28 +253,46 @@ export default async function FeedPage({ searchParams }: Props) {
 
       {/* Communities tab */}
       {tab === 'communities' && (
-        <div className="space-y-2">
-          {allCommunities.length === 0 ? (
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] py-16 text-center">
-              <p className="mb-4 text-sm text-[var(--muted-foreground)]">No communities yet.</p>
-              {user && (
-                <Link href="/c/new" className="text-sm text-[var(--accent)] hover:underline">
-                  Be the first to create one →
-                </Link>
-              )}
-            </div>
-          ) : (
-            allCommunities.map(c => (
-              <CommunityCard
-                key={c.id}
-                community={c}
-                membership={membershipMap.get(c.id) ?? null}
-                isLoggedIn={!!user}
-                memberCount={communityMemberCountMap.get(c.id) ?? 0}
-                isAdmin={membershipMap.get(c.id)?.role === 'admin'}
-              />
-            ))
-          )}
+        <div>
+          {/* Sort control */}
+          <div className="flex items-center gap-1 mb-4">
+            {(['newest', 'members', 'alpha'] as const).map(s => (
+              <Link
+                key={s}
+                href={`/feed?tab=communities&sort=${s}`}
+                className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                  (searchParams.sort ?? 'newest') === s
+                    ? 'bg-[var(--accent)] text-white'
+                    : 'bg-[var(--surface-raised)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+                }`}
+              >
+                {s === 'newest' ? 'Newest' : s === 'members' ? 'Most Members' : 'A–Z'}
+              </Link>
+            ))}
+          </div>
+          <div className="space-y-2">
+            {allCommunities.length === 0 ? (
+              <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] py-16 text-center">
+                <p className="mb-4 text-sm text-[var(--muted-foreground)]">No communities yet.</p>
+                {user && (
+                  <Link href="/c/new" className="text-sm text-[var(--accent)] hover:underline">
+                    Be the first to create one →
+                  </Link>
+                )}
+              </div>
+            ) : (
+              allCommunities.map(c => (
+                <CommunityCard
+                  key={c.id}
+                  community={c}
+                  membership={membershipMap.get(c.id) ?? null}
+                  isLoggedIn={!!user}
+                  memberCount={communityMemberCountMap.get(c.id) ?? 0}
+                  isAdmin={membershipMap.get(c.id)?.role === 'admin'}
+                />
+              ))
+            )}
+          </div>
         </div>
       )}
     </div>
