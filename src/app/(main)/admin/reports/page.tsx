@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { notFound } from 'next/navigation'
 import { resolveReport } from '@/lib/actions/report'
 import Link from 'next/link'
@@ -16,7 +17,8 @@ export default async function AdminReportsPage() {
 
   if (!profile?.is_platform_admin) notFound()
 
-  const { data: openReports } = await supabase
+  // Use service role to bypass reports_select_own RLS — admins must see all reports
+  const { data: openReports } = await createAdminClient()
     .from('reports')
     .select('*, reporter:profiles!reporter_id(username)')
     .is('resolved_at', null)

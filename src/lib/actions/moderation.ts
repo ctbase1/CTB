@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import { createAuditLog } from '@/lib/audit'
 
@@ -111,7 +112,8 @@ export async function banFromPlatform(userId: string): Promise<{ error: string }
 
   if (!profile?.is_platform_admin) return { error: 'Unauthorized' }
 
-  const { error } = await supabase
+  // Use service role to bypass profiles RLS (update_own blocks cross-user updates)
+  const { error } = await createAdminClient()
     .from('profiles')
     .update({ is_banned: true })
     .eq('id', userId)
@@ -141,7 +143,8 @@ export async function unbanFromPlatform(userId: string): Promise<{ error: string
 
   if (!profile?.is_platform_admin) return { error: 'Unauthorized' }
 
-  const { error } = await supabase
+  // Use service role to bypass profiles RLS (update_own blocks cross-user updates)
+  const { error } = await createAdminClient()
     .from('profiles')
     .update({ is_banned: false })
     .eq('id', userId)
