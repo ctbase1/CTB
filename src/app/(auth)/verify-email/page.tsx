@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { resendConfirmationByEmail } from './actions'
+import { VerifyPoller } from '../register/verify-poller'
 
 
 interface Props {
@@ -12,6 +13,7 @@ export default function VerifyEmailPage({ searchParams }: Props) {
 
   return (
     <div className="rounded-2xl border border-slate-700/50 bg-slate-900 p-8 shadow-glow-violet-sm text-center">
+      <VerifyPoller />
       <div className="mb-4 text-4xl">📬</div>
       <h2 className="mb-2 text-xl font-semibold text-white">Confirm your email</h2>
       <p className="mb-6 text-sm text-slate-400">

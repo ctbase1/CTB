@@ -2,6 +2,7 @@ import { signUp, resendConfirmation } from './actions'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { VerifyPoller } from './verify-poller'
 
 interface Props {
   searchParams: { error?: string; verify?: string; email?: string; resent?: string }
@@ -12,6 +13,7 @@ export default function RegisterPage({ searchParams }: Props) {
     const email = searchParams.email ? decodeURIComponent(searchParams.email) : ''
     return (
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center">
+        <VerifyPoller />
         <div className="mb-4 text-4xl">📬</div>
         <h2 className="mb-2 text-xl font-semibold text-[var(--foreground)]">Check your email</h2>
         <p className="mb-1 text-sm text-[var(--muted-foreground)]">
