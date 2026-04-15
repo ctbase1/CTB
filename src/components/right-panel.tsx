@@ -11,10 +11,12 @@ export async function RightPanel({ userId }: Props) {
   const supabase = createClient()
 
   // ── Hot Communities ──────────────────────────────────────────
-  const { data: allMemberships } = await supabase
-    .from('memberships')
-    .select('community_id')
-    .limit(2000)
+  const PINNED_SLUG = 'official-ctb-community-51rb'
+
+  const [{ data: allMemberships }, { data: pinnedCommunity }] = await Promise.all([
+    supabase.from('memberships').select('community_id').limit(2000),
+    supabase.from('communities').select('id, name, slug').eq('slug', PINNED_SLUG).eq('is_removed', false).single(),
+  ])
 
   const countMap = new Map<string, number>()
   for (const m of allMemberships ?? []) {
@@ -23,7 +25,8 @@ export async function RightPanel({ userId }: Props) {
 
   const topCommunityIds = Array.from(countMap.entries())
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 4)
+    .filter(([id]) => id !== pinnedCommunity?.id)
+    .slice(0, 3)
     .map(([id]) => id)
 
   const { data: hotCommunities } = topCommunityIds.length > 0
@@ -34,9 +37,12 @@ export async function RightPanel({ userId }: Props) {
         .eq('is_removed', false)
     : { data: [] }
 
-  const sortedHotCommunities = (hotCommunities ?? []).sort(
-    (a, b) => (countMap.get(b.id) ?? 0) - (countMap.get(a.id) ?? 0)
-  )
+  const sortedHotCommunities = [
+    ...(pinnedCommunity ? [pinnedCommunity] : []),
+    ...(hotCommunities ?? []).sort(
+      (a, b) => (countMap.get(b.id) ?? 0) - (countMap.get(a.id) ?? 0)
+    ),
+  ]
 
   // ── Who To Follow ─────────────────────────────────────────────
   const { data: followingRows } = await supabase

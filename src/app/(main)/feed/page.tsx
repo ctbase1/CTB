@@ -140,6 +140,14 @@ export default async function FeedPage({ searchParams }: Props) {
         )
       }
     }
+
+    // Always pin the official community to the top regardless of sort
+    const PINNED_SLUG = 'official-ctb-community-51rb'
+    const pinnedIdx = allCommunities.findIndex(c => c.slug === PINNED_SLUG)
+    if (pinnedIdx > 0) {
+      const [pinned] = allCommunities.splice(pinnedIdx, 1)
+      allCommunities.unshift(pinned)
+    }
   }
 
   // Bulk like + comment counts + saved + user-liked state for post tabs
