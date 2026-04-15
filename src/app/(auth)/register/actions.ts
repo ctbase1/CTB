@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ctbase.org'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ctbase.live'
 
 export async function signUp(formData: FormData) {
   const email    = formData.get('email') as string
