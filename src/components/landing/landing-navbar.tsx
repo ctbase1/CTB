@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { CaDisplay } from './ca-display'
 
 export async function LandingNavbar() {
   const supabase = createClient()
@@ -17,6 +18,8 @@ export async function LandingNavbar() {
         </Link>
 
         <div className="flex-1" />
+
+        <CaDisplay />
 
         <ThemeToggle />
 

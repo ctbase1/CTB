@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { CaDisplay } from './ca-display'
 
 export function LandingFooter() {
   return (
@@ -21,9 +22,12 @@ export function LandingFooter() {
           </Link>
         </div>
 
-        <p className="text-xs text-[var(--muted)]">
-          &copy; {new Date().getFullYear()} CTB. All rights reserved.
-        </p>
+        <div className="flex flex-col items-center sm:items-end gap-1">
+          <CaDisplay />
+          <p className="text-xs text-[var(--muted)]">
+            &copy; {new Date().getFullYear()} CTB. All rights reserved.
+          </p>
+        </div>
       </div>
     </footer>
   )
